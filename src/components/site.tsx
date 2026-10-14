@@ -19,6 +19,7 @@ import {
   Layers,
 } from "lucide-react";
 import vincelogo from "@/assets/vincelogo.png";
+import vinceHero from "@/assets/vincehero.png";
 import hero from "@/assets/hero.jpg";
 import customTee from "@/assets/custom-tee.jpg";
 import culture from "@/assets/culture.jpg";
@@ -328,43 +329,49 @@ export function Hero() {
       id="home"
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-[#080808]"
     >
+      {/* Background Hero Image - Full fidelity, bright, and perfectly positioned */}
       <img
-        src={hero}
-        alt="Model wearing an oversized black custom printed T-shirt in a dark urban studio"
-        width={1920}
-        height={1088}
-        className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-85 transition-transform duration-100 ease-out"
+        src={vinceHero}
+        alt="Model wearing an oversized black custom printed T-shirt in the Vince Outlets Puducherry studio"
+        width={1150}
+        height={1367}
+        fetchPriority="high"
+        className="absolute inset-0 h-full w-full object-cover object-[center_top] md:object-[78%_10%] lg:object-[80%_8%] opacity-100 transition-transform duration-100 ease-out"
         style={{
-          transform: `translateY(${y * 0.18}px) scale(${1.04 + y * 0.0001})`,
+          transform: `translateY(${y * 0.12}px) scale(${1.02 + y * 0.0001})`,
         }}
       />
-      {/* Cinematic dark vignettes crafted to keep model prominent while maximizing text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/75 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/95 via-[#080808]/50 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_transparent_35%,_#080808_95%)] pointer-events-none" />
 
-      <div className="relative mx-auto w-full max-w-[1500px] px-5 pb-14 pt-36 lg:px-10 lg:pb-20">
-        <div className="inline-flex items-center gap-2.5 rounded-full border border-[#D4A62A]/40 bg-[#101010]/90 px-4 py-1.5 backdrop-blur-md mb-6 animate-fade-in shadow-[0_0_20px_rgba(212,166,42,0.18)]">
+      {/* Warm ambient studio backlight enhancement behind the model */}
+      <div className="pointer-events-none absolute top-12 md:top-20 right-1/2 md:right-[20%] translate-x-1/2 md:translate-x-0 h-72 w-72 md:h-96 md:w-96 rounded-full bg-[radial-gradient(circle,rgba(212,166,42,0.18),transparent_70%)] blur-2xl" />
+
+      {/* Vignettes: Only darken the bottom where text and buttons sit, keeping the face 100% clear & bright */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/85 via-45% to-transparent to-75% pointer-events-none" />
+      <div className="hidden md:block absolute inset-y-0 left-0 w-3/5 bg-gradient-to-r from-[#080808]/95 via-[#080808]/60 to-transparent pointer-events-none" />
+
+      {/* Foreground Content - Positioned cleanly in the lower zone on his black t-shirt so his face is completely unobstructed */}
+      <div className="relative mx-auto w-full max-w-[1500px] px-5 pb-8 pt-24 sm:pb-12 sm:pt-32 lg:px-10 lg:pb-16">
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#D4A62A]/40 bg-[#101010]/85 px-3 py-1 sm:px-4 sm:py-1.5 backdrop-blur-md mb-3 sm:mb-6 animate-fade-in shadow-[0_0_20px_rgba(212,166,42,0.18)]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#D4A62A] shadow-[0_0_8px_#D4A62A] animate-pulse" />
-          <span className="text-[11px] font-bold tracking-[0.28em] text-[#F4D477] uppercase">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.25em] text-[#F4D477] uppercase">
             VINCE OUTLETS • PUDUCHERRY STUDIO
           </span>
         </div>
 
-        <h1 className="display text-[14vw] leading-[0.88] sm:text-[10vw] lg:text-[8.5vw] tracking-tight">
-          <span className="block text-white animate-fade-in drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
+        <h1 className="display text-[12vw] leading-[0.9] sm:text-[9vw] md:text-6xl lg:text-[7vw] xl:text-[7.5vw] tracking-tight">
+          <span className="block text-white animate-fade-in drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
             WEAR AWESOME.
           </span>
-          <span className="block text-metal animate-fade-in [animation-delay:150ms] drop-shadow-[0_4px_30px_rgba(212,166,42,0.25)]">
+          <span className="block text-metal animate-fade-in [animation-delay:150ms] drop-shadow-[0_4px_30px_rgba(212,166,42,0.3)]">
             MAKE IT YOURS.
           </span>
         </h1>
 
-        <p className="mt-6 max-w-xl text-base sm:text-lg text-[#D9D9D9] font-normal leading-relaxed">
+        <p className="mt-3 sm:mt-5 max-w-xl text-sm sm:text-base lg:text-lg text-[#E5E5E5] font-normal leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)]">
           Custom streetwear made around your vibe — from one bespoke statement tee to full squad drops, crafted in our Puducherry studio.
         </p>
 
-        <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
+        <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row">
           <WhatsAppButton
             text={MSG.custom}
             className="shadow-[0_4px_25px_rgba(212,166,42,0.35)]"
@@ -377,7 +384,7 @@ export function Hero() {
         </div>
 
         {/* Campaign hallmarks bar */}
-        <div className="mt-14 pt-7 border-t border-[#222222] flex flex-wrap items-center gap-y-3 gap-x-8 text-xs font-semibold tracking-[0.2em] text-[#A3A3A3]">
+        <div className="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-[#222222] flex flex-wrap items-center gap-y-2.5 gap-x-6 sm:gap-x-8 text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-[#A3A3A3]">
           <span className="flex items-center gap-2 text-white">
             <Sparkles size={13} className="text-[#D4A62A]" /> 100% COMBED COTTON
           </span>
@@ -392,6 +399,7 @@ export function Hero() {
     </section>
   );
 }
+
 
 export function Statement() {
   const pillars = [
