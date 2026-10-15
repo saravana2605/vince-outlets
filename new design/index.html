@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BASALT — heavyweight technical fleece</title>
+<meta name="description" content="Heavy gauge. Thermal loft. Oversized fit. Limited quantity.">
+<style>
+/* ═══ TOKENS ═══════════════════════════════════════════════════════════════
+   ARTEFAKT's palette is pure black + pure white. This is petrol-black and bone,
+   and the garment's key light is amber where that one is azure. Same grammar,
+   different voice. */
+:root{
+  --surface:#04070a;              /* the hairlines between cells, and the page ground */
+  --surface-lattice:#0e1418;      /* the cell fill */
+  --content:#eef2f0;
+  --content-muted:rgb(238 242 240 / .42);
+  --content-faint:rgb(238 242 240 / .26);
+  --rule:rgb(238 242 240 / .26);
+  --rule-full:rgb(238 242 240 / .92);
+
+  /* ARTEFAKT sets everything in IBM 3270, a boxy terminal bitmap face. This is a
+     modern humanist mono — visibly a different voice, and NOTHING IS FETCHED, so
+     there is no font request gating the curtain. Monospace is still load-bearing:
+     the scramble decoder substitutes characters in place and nothing may reflow. */
+  --mono:ui-monospace,'SF Mono','Cascadia Code','Source Code Pro',Menlo,Consolas,'DejaVu Sans Mono',monospace;
+
+  --lattice-pitch:.625rem; --lattice-pitch-y:.75rem;
+  --lattice-gap:.125rem; --lattice-offset:-.0625rem;
+  --accent:#ff8a4c;
+  --lattice-reach:12rem;   --stage-fade:17rem;
+  --fast:150ms; --normal:250ms; --ease:cubic-bezier(.2,0,0,1);
+  --pointer-x:-100vw; --pointer-y:-100vh; --pointer-lag-x:-100vw; --pointer-lag-y:-100vh;
+}
+/* The lattice must land on WHOLE PIXELS or it stops being squares: a rem is not a
+   whole number of pixels at most window sizes, and the fractional error repeats on
+   a three-cell beat as a ripple that crawls when anything moves. */
+@supports (width: round(1px,1px)){
+  :root{
+    --lattice-pitch:round(.625rem,1px);
+    --lattice-pitch-y:round(.75rem,1px);
+    --lattice-gap:round(.125rem,1px);
+    --lattice-offset:round(calc(var(--lattice-gap) / -2),1px);
+  }
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{background-color:var(--surface);/* so a rubber-band overscroll shows the page's
+      own ground rather than a white flash */
+  font-size:16px;-webkit-text-size-adjust:100%}
+/* THE ARTBOARD. From the frame breakpoint the root font-size IS the 1440x800
+   artboard's scale factor, so every rem is one artboard unit. Bound by whichever
+   axis runs out first — a width-only scale crops the bottom off every screen on a
+   maximised 1920x1080 browser. lvh, never vh. */
+@media (min-width:1024px) and (min-aspect-ratio:1/1){
+  html{font-size:min(1.111111vw,2lvh)}
+}
+body{background:transparent;color:var(--content);font-family:var(--mono);
+  font-size:1.125rem;line-height:1.1;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);
+  white-space:nowrap}
+
+/* ═══ THE LATTICE ═════════════════════════════════════════════════════════
+   TWO elements, and the order is load-bearing: the beam is FIRST, the bars paint
+   OVER it. The gap gradients are opaque, so the highlight survives only inside the
+   cells — it reads as the grid BRIGHTENING IN SQUARES, never as a lamp shining
+   across it. Swap them and it stops looking like the page. */
+#shell{position:relative;min-height:100lvh;overflow-x:clip;   /* clip, NOT hidden —
+        hidden makes it a scroll container and breaks every sticky section */
+  background-color:var(--surface-lattice)}
+#beam{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle var(--lattice-reach) at var(--pointer-x) var(--pointer-y),
+      rgb(238 242 240 / .075) 0%, rgb(238 242 240 / .058) 26%,
+      rgb(238 242 240 / .036) 52%, rgb(238 242 240 / .017) 74%,
+      rgb(238 242 240 / .005) 89%, transparent 100%),
+    radial-gradient(circle calc(var(--lattice-reach) * 1.75) at var(--pointer-x) var(--pointer-y),
+      rgb(238 242 240 / .018) 0%, rgb(238 242 240 / .009) 48%, transparent 100%),
+    radial-gradient(circle calc(var(--lattice-reach) * 1.2) at var(--pointer-lag-x) var(--pointer-lag-y),
+      rgb(238 242 240 / .034) 0%, rgb(238 242 240 / .015) 52%, transparent 100%)}
+@media (hover:none) and (pointer:coarse){#beam{display:none}}
+#bars{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:
+    repeating-linear-gradient(to right, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch)),
+    repeating-linear-gradient(to bottom, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch-y));
+  background-position:var(--lattice-offset) var(--lattice-offset)}
+
+/* An OPAQUE copy of the same surface: panels KNOCK OUT the artwork behind them
+   rather than being transparent cards over it. Five layers, and one attachment
+   value per layer — a short list is repeated and silently hands the last layer the
+   wrong attachment. Because the highlight layers are viewport-anchored, every panel
+   lights in phase with the page behind it. NEVER put this on a transformed element. */
+.panel{
+  background-color:var(--surface-lattice);
+  background-image:
+    repeating-linear-gradient(to right, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch)),
+    repeating-linear-gradient(to bottom, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch-y)),
+    radial-gradient(circle var(--lattice-reach) at var(--pointer-x) var(--pointer-y),
+      rgb(238 242 240 / .075) 0%, rgb(238 242 240 / .058) 26%,
+      rgb(238 242 240 / .036) 52%, rgb(238 242 240 / .017) 74%, transparent 100%),
+    radial-gradient(circle calc(var(--lattice-reach) * 1.75) at var(--pointer-x) var(--pointer-y),
+      rgb(238 242 240 / .018) 0%, rgb(238 242 240 / .009) 48%, transparent 100%),
+    radial-gradient(circle calc(var(--lattice-reach) * 1.2) at var(--pointer-lag-x) var(--pointer-lag-y),
+      rgb(238 242 240 / .034) 0%, rgb(238 242 240 / .015) 52%, transparent 100%);
+  background-position:var(--lattice-offset) var(--lattice-offset),
+                      var(--lattice-offset) var(--lattice-offset),0 0,0 0,0 0;
+  background-attachment:scroll,scroll,fixed,fixed,fixed}
+
+main{position:relative;z-index:2}
+section{position:relative}
+
+/* ═══ TYPE RAMP — rem against the 1440 base ══════════════════════════════
+   The four smallest roles carry max(<rem>,12px): at 1024 the artboard renders at
+   71% and 12 units becomes 8.5px. At 1440 the floor is a no-op. */
+.t-caption{font-size:max(.75rem,12px);letter-spacing:-.02em;line-height:1.1}
+.t-body{font-size:max(1.125rem,12px);line-height:1.1}
+.t-lede{font-size:1.25rem;line-height:1.1}
+.t-fine{font-size:max(.8125rem,12px);line-height:1.1}
+.t-chip{font-size:max(.875rem,12px);line-height:1.1}
+.t-title{font-size:1.625rem;line-height:1.1}
+.t-display{font-size:2.5rem;line-height:.8;letter-spacing:-.02em;text-transform:uppercase}
+@media (min-width:640px){.t-display{font-size:3.125rem}}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){.t-display{font-size:4.375rem}}
+.muted{color:var(--content-muted)}
+.secIx{display:flex;align-items:center;gap:.75rem;color:var(--accent);
+  margin-bottom:1.25rem;white-space:nowrap}
+.secIx::after{content:'';flex:1;height:1px;background:var(--rule);min-width:2rem}
+.faint{color:var(--content-faint)}
+.ix{color:var(--accent);opacity:.85}
+.up{text-transform:uppercase}
+
+/* ═══ THE BRACKETED BUTTON ═══════════════════════════════════════════════
+   Hover adds NOTHING to the box. Nothing on this page is filled, so any wash reads
+   as a muddy rectangle borrowed from a different site. Instead four corner brackets
+   converge on it — a target being acquired. The brackets ARE the focus indicator,
+   so the default outline is dropped, but brought back under forced-colors. */
+.btn{position:relative;display:inline-flex;align-items:center;gap:2rem;
+  height:2.875rem;padding-inline:1.25rem;border:1px solid var(--rule-full);
+  cursor:pointer;font-size:1.25rem;line-height:1;white-space:nowrap}
+.btn .arw{transition:transform var(--normal) var(--ease)}
+.btn:hover .arw,.btn:focus-visible .arw{transform:translateX(4px)}
+.btn i{position:absolute;width:.625rem;height:.625rem;opacity:0;
+  transition:opacity var(--normal) var(--ease),transform var(--normal) var(--ease)}
+.btn i:nth-child(1){top:-.75rem;left:-.75rem;border-top:1px solid var(--content);border-left:1px solid var(--content);transform:translate(-4px,-4px)}
+.btn i:nth-child(2){top:-.75rem;right:-.75rem;border-top:1px solid var(--content);border-right:1px solid var(--content);transform:translate(4px,-4px)}
+.btn i:nth-child(3){bottom:-.75rem;left:-.75rem;border-bottom:1px solid var(--content);border-left:1px solid var(--content);transform:translate(-4px,4px)}
+.btn i:nth-child(4){bottom:-.75rem;right:-.75rem;border-bottom:1px solid var(--content);border-right:1px solid var(--content);transform:translate(4px,4px)}
+.btn:hover i,.btn:focus-visible i{opacity:1;transform:translate(0,0)}
+.btn:focus-visible{outline:none}
+@media (forced-colors:active){.btn:focus-visible{outline:2px solid}}
+</style>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TWO LAYOUTS, NOT A RESPONSIVE SCALE BETWEEN THEM.
+   Below the frame breakpoint: ordinary flow at a 16px root. At and above it: the
+   1440x800 artboard reproduced, everything absolute at the artboard's own
+   coordinates. The two media conditions must be EXACT COMPLEMENTS — a portrait
+   tablet is closer to a large phone than to a desktop, so it gets flow.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── FLOW (the default) ─────────────────────────────────────────────────── */
+.pad{padding-inline:1.25rem}
+#hdrWrap{position:sticky;top:0;z-index:50}
+#hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem;border-bottom:1px solid var(--rule)}
+#nav,#cart{display:none}
+#burger{background:none;border:1px solid var(--rule);width:2.5rem;height:2.5rem;
+  display:grid;place-items:center;cursor:pointer}
+#menu{position:fixed;inset:0;z-index:60;display:none;place-content:center;gap:1.5rem;
+  text-align:center}
+#menu.on{display:grid}
+#menu a{font-size:1.5rem}
+#logo{width:1.875rem;height:4.6875rem}
+
+#hero{min-height:100lvh;display:flex;flex-direction:column;justify-content:space-between;
+  gap:1.5rem;padding:1.5rem 1.25rem 2rem}
+#plateWrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#markers{display:flex;justify-content:space-between;gap:1rem;position:relative;z-index:2}
+#prodBox{position:relative;z-index:1;aspect-ratio:4/3;width:100%}
+@media(min-width:640px){#prodBox{aspect-ratio:16/9}}
+#claim{position:relative;z-index:2;text-align:center}
+#heroCta{display:flex;justify-content:center;position:relative;z-index:2}
+#badges{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;position:relative;z-index:2}
+.badge{border:1px solid var(--rule);padding:.75rem;display:flex;gap:.75rem;align-items:stretch}
+.badge .gl{display:flex;flex-direction:column;gap:.4rem;align-items:flex-start}
+.badge .vr{width:1px;background:var(--rule);flex:none}
+
+.sec{padding:4rem 1.25rem}
+#detRows{display:grid;gap:.75rem;margin-top:2rem}
+@media(min-width:640px){#detRows{grid-template-columns:1fr 1fr}
+  #detRows li:last-child{grid-column:1 / -1}}
+.drow{border:1px solid var(--rule);padding:1rem;display:flex;gap:1rem}
+.drow .rail{display:flex;flex-direction:column;justify-content:space-between;flex:none}
+
+#cards{display:grid;gap:.75rem;margin-top:2rem}
+@media(min-width:640px){#cards{grid-template-columns:1fr 1fr}}
+.card{position:relative;border:1px solid var(--rule);padding:1rem;height:27.875rem;
+  display:flex;flex-direction:column;justify-content:space-between}
+.cardSurf{position:absolute;inset:0;padding:1rem;display:flex;flex-direction:column;
+  justify-content:space-between}
+.cardLayer{position:absolute;inset:0;display:grid;place-items:end center;z-index:0;
+  pointer-events:none;padding-bottom:2.6rem}
+.cardLayer img{width:18.5625rem;height:18.5625rem;object-fit:contain;opacity:0;
+  transition:opacity var(--normal) linear;position:absolute}
+.cardLayer img.on{opacity:1}
+.cardTop,.cardBot{position:relative;z-index:1}
+.cardTitle{max-width:13.5625rem}
+.swatches{position:absolute;top:50%;right:1rem;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:.25rem;z-index:2}
+.swatches button{width:.75rem;height:.75rem;border:1px solid var(--rule);background:none;
+  cursor:pointer;padding:0}
+.swatches button[aria-current="true"]{background:var(--accent);border-color:var(--accent)}
+.swatches button:hover{border-color:var(--content)}
+.cardBot{height:2.3125rem;position:relative}
+.chips,.shop{position:absolute;inset:0;display:flex;align-items:center;gap:.5rem;
+  transition:opacity var(--fast) linear}
+.chips span{border:1px solid var(--content-muted);padding:.3em .875rem}
+.shop{opacity:0;pointer-events:none}
+.shop a{border:1px solid var(--content);padding:.3em .875rem;display:inline-flex;
+  align-items:center;gap:.75rem}
+.card:hover .chips,.card:focus-within .chips{opacity:0}
+.card:hover .shop,.card:focus-within .shop{opacity:1;pointer-events:auto}
+@media (hover:none){.chips{opacity:0!important}.shop{opacity:1!important;pointer-events:auto!important}}
+
+#tech{padding:4rem 1.25rem}
+#reelBox{position:relative;width:100%;aspect-ratio:1/1;margin:2rem auto;max-width:41.5625rem}
+#reel{width:100%;height:100%;display:block}
+#techCards{display:grid;gap:.75rem}
+.tcard{border:1px solid var(--rule);padding:1rem;display:flex;gap:1rem}
+
+#faqList{display:grid;gap:.75rem;margin-top:2rem}
+.frow{border:1px solid var(--rule);padding:1rem;display:flex;flex-direction:column;gap:1rem}
+.frow dt{display:flex;flex-direction:column-reverse;gap:.5rem}
+.frow dd{border-top:1px solid var(--rule);padding-top:1rem;margin:0}
+
+#foot{padding:3rem 1.25rem 2rem}
+#footCols{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem}
+#footCols h3{margin-bottom:.75rem;font-weight:400}
+#footCols a{display:block;padding:.28em 0;color:var(--content-muted)}
+#footCols a:hover{color:var(--content)}
+#news{margin-bottom:2.5rem;max-width:22rem}
+#news .field{display:flex;border:1px solid var(--content);margin-top:.75rem}
+#news input[type=email]{flex:1;background:none;border:0;outline:none;
+  padding:max(.875rem,14px) max(1rem,16px)}
+#news button[type=submit]{background:none;border:0;cursor:pointer;padding-inline:1rem}
+#consent{display:flex;gap:.6rem;align-items:center;margin-top:.75rem}
+#consent input{appearance:none;-webkit-appearance:none;width:.625rem;height:.625rem;
+  border:1px solid var(--rule);background:none;cursor:pointer;flex:none}
+#consent input:checked{background:var(--content);border-color:var(--content)}
+#consent input:hover{border-color:var(--content)}
+#footRule{height:1px;background:var(--rule);margin-bottom:1.25rem}
+#footEnd{display:flex;flex-direction:column-reverse;gap:.6rem}
+
+/* ── FRAME: the 1440x800 artboard ───────────────────────────────────────── */
+@media (min-width:1024px) and (min-aspect-ratio:1/1){
+  .pad{padding-inline:0}
+  /* zero height so the banner keeps the artboard's coordinates and takes no space
+     in the flow, and the hero still starts at the top of the canvas */
+  #hdrWrap{height:0}
+  #hdr{border:0;padding:0}
+  #logo{position:absolute;top:1.5rem;left:2.5rem;width:1.875rem;height:4.6875rem}
+  #nav{display:flex;position:absolute;top:1.5rem;left:50%;transform:translateX(-50%);
+    gap:4rem;line-height:.9}
+  #cart{display:block;position:absolute;top:1.5rem;right:2.5rem;line-height:.9}
+  #burger{display:none}
+  .navItem{position:relative}
+  .navPanel{position:absolute;top:100%;left:0;padding-top:1rem;visibility:hidden}
+  /* the 16 units are PADDING ON THE WRAPPER, not a margin on the panel — as a
+     margin they are dead space the pointer crosses on its way down, which counts
+     as leaving the wrapper, and the menu closed before it could be reached */
+  .navItem[data-open="true"] .navPanel{visibility:visible}
+  .navPanel > div{border:1px solid var(--rule);padding:1rem;min-width:14rem;
+    display:flex;flex-direction:column;gap:.75rem}
+  .navPanel a{color:var(--content-muted);white-space:nowrap;width:7.4375rem}
+  .navPanel a:hover{color:var(--content)}
+
+  #hero{position:relative;display:block;min-height:100lvh;padding:0}
+  #hero > *{position:absolute}
+  #markers{display:contents}
+  .marker{position:absolute;top:50%;transform:translateY(-50%)}
+  .marker.l{left:2.5rem;width:9.75rem;text-align:left}
+  .marker.r{right:2.5rem;width:11.5625rem;text-align:right}
+  #prodBox{position:absolute;inset:0;aspect-ratio:auto}
+  #claim{left:0;right:0;bottom:7.375rem;text-align:center}
+  #heroCta{left:0;right:0;bottom:2.5rem}
+  #badges{display:contents}
+  .badge{position:absolute;bottom:2.5rem;height:max(4.25rem,68px);padding:.75rem}
+  .badge.l{left:2.5rem;width:max(16.4375rem,263px)}
+  .badge.r{right:2.5rem;width:max(13.875rem,222px)}
+
+  .sec{padding:0}
+  /* Details, Collections and FAQ each carry pairs that must stay level, and those
+     drift apart by exactly the slack on a taller screen. A centred 800-unit box
+     with a NEGATIVE MARGIN — never translateY(-50%), which makes the box a
+     containing block and knocks the panels' fixed layers out of step. */
+  .boxed{height:100lvh;min-height:50rem}
+  .boxed > .inner{position:absolute;inset-inline:0;top:50%;margin-top:-25rem;height:50rem}
+  .inner > *{position:absolute}
+  #detHead{top:7.625rem;left:2.5rem;width:21.5rem}
+  #detLede{margin-top:2.25rem;max-width:21.5rem}
+  #detRows{display:flex;flex-direction:column;top:7.625rem;right:2.5rem;width:26.0625rem;gap:.75rem;margin:0}
+  #detCta{bottom:2.5rem;left:2.5rem}
+  .drow{align-items:stretch}
+  .drow .rail{align-items:flex-start}
+
+  #colHead{top:8.125rem;left:2.5rem}
+  #colLede{top:7.625rem;right:5.375rem;width:17.8125rem}
+  #cards{display:flex;top:14.25rem;inset-inline:2.5rem;gap:.75rem;margin:0}
+  #cards > li{flex:1;min-width:0}
+  .card{height:27.875rem;border:1px solid var(--rule)}
+  #colCta{bottom:2.5rem;left:0;right:0;display:flex;justify-content:center}
+
+  #tech{height:calc(2.6 * 50rem);padding:0}
+  #techStage{position:sticky;top:0;height:50rem;overflow:hidden}
+  #techStage > *{position:absolute}
+  #techHead{top:8.5rem;left:2.5rem;width:22.9375rem}
+  #techNote{top:40.625rem;left:2.5rem;width:22.9375rem}
+  /* centred with AUTO MARGINS, not translateX(-50%) — a transform here isolates
+     what the walk tries to measure against */
+  #reelBox{top:8.5rem;inset-inline:0;height:38.6875rem;width:41.5625rem;margin:0 auto;
+    aspect-ratio:auto;max-width:none}
+  #techCards{display:block;top:8.5rem;right:2.5rem;width:20rem}
+  .tcard{position:absolute;inset-inline:0;opacity:0;transition:opacity var(--normal) linear}
+  .tcard.on{opacity:1}
+
+  #faqHead{top:8.5rem;left:2.5rem;width:16.125rem}
+  #faqList{display:flex;flex-direction:column;top:8.5rem;right:2.5rem;width:42.125rem;
+    gap:.75rem;margin:0}
+  .frow{flex-direction:row;height:7.125rem;padding:0 1rem;align-items:stretch;gap:0}
+  .frow dt{width:12.1875rem;justify-content:center;flex-direction:column;gap:2rem;
+    align-self:center}
+  .frow dt .q{max-width:10.9375rem}
+  .frow.wide dt .q{max-width:12.1875rem}
+  /* top-aligned with a MEASURED padding, not centred: the artboard centres the
+     answer in its own box while the question sits in a centred column beside it,
+     so their first lines never met */
+  .frow dd{margin-left:2rem;padding-left:2rem;padding-top:.92rem;border-top:0;
+    border-left:1px solid var(--rule);flex:1}
+
+  #foot{position:relative;height:21.875rem;padding:0}
+  #foot > *{position:absolute}
+  #footLogo{top:1.5rem;left:2.5rem;width:2.5rem;height:6.1875rem}
+  #footCols{display:flex;top:1.5rem;left:18.5625rem;gap:3rem;margin:0}
+  #footCols > div{width:7.5rem}
+  #footCols > div:last-child{width:auto}
+  #news{top:1.5rem;right:2.5rem;width:max(15.3125rem,245px);margin:0;max-width:none}
+  #footRule{top:17.875rem;inset-inline:2.5rem;margin:0}
+  #footEnd{flex-direction:row;justify-content:space-between;top:19.375rem;
+    inset-inline:2.5rem}
+}
+
+/* ═══ THE CURTAIN ═════════════════════════════════════════════════════════ */
+#curtain{position:fixed;inset:0;z-index:100;display:grid;place-items:center;
+  background-color:var(--surface-lattice);
+  background-image:
+    repeating-linear-gradient(to right, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch)),
+    repeating-linear-gradient(to bottom, var(--surface) 0 var(--lattice-gap),
+      transparent var(--lattice-gap) var(--lattice-pitch-y));
+  background-position:var(--lattice-offset) var(--lattice-offset);
+  transition:opacity 500ms linear}
+#curtain.out{opacity:0;pointer-events:none}
+#curtainIn{width:20rem;display:grid;justify-items:center;gap:1.25rem}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){#curtainIn{width:16rem}}
+#curtainIn .mk{height:4rem;transition:transform 700ms var(--ease)}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){#curtainIn .mk{height:3rem}}
+#curtain.out .mk{transform:scale(1.05)}
+#track{width:100%;height:1px;background:var(--rule);overflow:hidden}
+#fill{height:100%;background:var(--accent);transform:scaleX(0);transform-origin:left}
+#count{font-size:max(1.125rem,12px);color:var(--content-muted);font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){
+  #count{font-size:max(.75rem,12px);color:var(--content-faint)}}
+#curtain b{position:absolute;width:2.5rem;height:2.5rem;
+  transition:transform 700ms var(--ease),opacity 700ms linear}
+#curtain b:nth-of-type(1){top:2.5rem;left:2.5rem;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+#curtain b:nth-of-type(2){top:2.5rem;right:2.5rem;border-top:1px solid var(--rule);border-right:1px solid var(--rule)}
+#curtain b:nth-of-type(3){bottom:2.5rem;left:2.5rem;border-bottom:1px solid var(--rule);border-left:1px solid var(--rule)}
+#curtain b:nth-of-type(4){bottom:2.5rem;right:2.5rem;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
+#curtain.out b{transform:scale(1.5);opacity:0}
+
+/* ═══ THE PRODUCT STAGE ═══════════════════════════════════════════════════ */
+#region{position:relative}
+#stage{position:absolute;inset:0;z-index:1;pointer-events:none;
+  transform:translateZ(0);backface-visibility:hidden;opacity:0;
+  transition:opacity var(--normal) linear}
+#stage.on{opacity:1}
+#stageCv{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){
+  /* `inset:auto` is a SHORTHAND for all four sides: declared after `top` it reset
+     top back to auto and the element never pinned — it scrolled away from frame one. */
+  #stage{inset:auto;position:sticky;height:50rem;top:calc((100lvh - 50rem) / 2)}
+  #region{--pull:0}
+  /* opaque for the first third, then a long even decay — a linear ramp ghosts the
+     lattice across the whole lower body, and a short one puts back the hard line
+     the fade exists to hide */
+  #stage{mask-image:linear-gradient(to bottom,#000 0,
+    #000 calc(100% - var(--stage-fade)),
+    rgb(0 0 0 / .97) calc(100% - var(--stage-fade) * .68),
+    rgb(0 0 0 / .82) calc(100% - var(--stage-fade) * .52),
+    rgb(0 0 0 / .55) calc(100% - var(--stage-fade) * .36),
+    rgb(0 0 0 / .26) calc(100% - var(--stage-fade) * .20),
+    rgb(0 0 0 / .08) calc(100% - var(--stage-fade) * .08),
+    transparent 100%)}
+  #heroPull{margin-top:-50rem}
+}
+#faqStage{display:none}
+@media (min-width:1024px) and (min-aspect-ratio:1/1){
+  #faqStage{display:block;position:absolute;inset:0;z-index:0;pointer-events:none;
+    transform:translateZ(0)}
+  #faqStage canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="beam" aria-hidden="true"></div>
+  <div id="bars" aria-hidden="true"></div>
+
+  <div id="hdrWrap" class="panel">
+    <header id="hdr">
+      <a href="#" id="logoLink" aria-label="Basalt, home">
+        <svg id="logo" viewBox="0 0 30 75" fill="none" aria-hidden="true">
+          <rect x=".5" y=".5" width="29" height="74" stroke="currentColor"/>
+          <path d="M7 14h16M7 26h16M7 38h16M7 50h11M7 62h16" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </a>
+      <nav id="nav">
+        <a href="#" class="sc t-body">SHOP</a>
+        <span class="navItem" data-open="false">
+          <button type="button" class="sc t-body" id="colBtn" aria-expanded="false" aria-controls="colPanel"
+            style="background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem">
+            COLLECTIONS
+            <svg width="6" height="5" viewBox="0 0 6 5" aria-hidden="true" class="caret"
+              style="transition:transform var(--fast) linear"><path d="M0 0h6L3 5z" fill="currentColor"/></svg>
+          </button>
+          <div class="navPanel" id="colPanel"><div class="panel">
+            <a href="#" class="sc t-body">HEAVY GAUGE HOODIE</a>
+            <a href="#" class="sc t-body">THERMAL LOFT HOODIE</a>
+            <a href="#" class="sc t-body">UTILITY ZIP HOODIE</a>
+            <a href="#" class="sc t-body">SHELL LINED HOODIE</a>
+          </div></div>
+        </span>
+        <a href="#" class="sc t-body">TECHNOLOGY</a>
+        <a href="#" class="sc t-body">ABOUT</a>
+      </nav>
+      <span id="cart" class="sc t-body">CART [ 0 ]</span>
+      <button id="burger" type="button" aria-label="Menu" aria-expanded="false">
+        <svg width="16" height="10" viewBox="0 0 16 10" aria-hidden="true">
+          <path d="M0 1h16M0 9h16" stroke="currentColor"/></svg>
+      </button>
+    </header>
+  </div>
+  <div id="menu"><a href="#">SHOP</a><a href="#">COLLECTIONS</a><a href="#">TECHNOLOGY</a><a href="#">ABOUT</a></div>
+
+  <main>
+  <div id="region">
+    <div id="stage" aria-hidden="true"><canvas id="stageCv"
+      role="img" aria-label="Oversized heavyweight technical fleece hoodie, slate"></canvas></div>
+
+    <!-- ═══ 1 HERO ═══ -->
+    <section id="heroPull"><div id="hero">
+      <div id="plateWrap" aria-hidden="true">
+        <img id="plateRest" src="assets/img/wordmark.webp" alt="">
+        <img id="plateLit" src="assets/img/wordmark.webp" alt="">
+      </div>
+      <div id="markers">
+        <div class="marker l t-body">
+          <svg class="brk" width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><path d="M0 11V0h11" stroke="currentColor"/></svg>
+          <p class="sc">ENGINEERED<br>FOR WEIGHT.<br>BUILT TO OUTLAST.</p>
+          <svg class="brk f" width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><path d="M0 11V0h11" stroke="currentColor"/></svg>
+        </div>
+        <div class="marker r t-body">
+          <svg class="brk" width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><path d="M11 11V0H0" stroke="currentColor"/></svg>
+          <p class="sc">CUT FOR<br>THE LONG WEAR.<br>READY FOR COLD.</p>
+          <svg class="brk f" width="11" height="11" viewBox="0 0 11 11" aria-hidden="true"><path d="M11 11V0H0" stroke="currentColor"/></svg>
+        </div>
+      </div>
+      <div id="prodBox"></div>
+      <h1 id="claim" class="t-lede">
+        <span class="sc" data-keep>HEAVY GAUGE. THERMAL LOFT.</span><br>
+        <span class="sc" data-keep>OVERSIZED FIT. LIMITED QUANTITY.</span>
+      </h1>
+      <div id="heroCta">
+        <a href="#" class="btn sc"><i></i><i></i><i></i><i></i>SHOP NOW
+          <svg class="arw" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 3h8M6 1l2 2-2 2" stroke="currentColor"/></svg></a>
+      </div>
+      <div id="badges">
+        <div class="badge l panel">
+          <div class="gl"><svg id="globe" width="37" height="23" viewBox="0 0 37 23" aria-hidden="true">
+            <ellipse cx="18.5" cy="11.5" rx="11" ry="11" stroke="currentColor" fill="none"/>
+            <ellipse cx="18.5" cy="11.5" rx="4.4" ry="11" stroke="currentColor" fill="none"/>
+            <path d="M7.5 11.5h22" stroke="currentColor"/></svg>
+            <span class="t-caption faint sc">EST.2019</span></div>
+          <div class="vr"></div>
+          <p class="t-caption sc">MADE IN HEAVY GAUGE.<br>KNITTED SLOW.<br>WORN FOR YEARS.</p>
+        </div>
+        <div class="badge r panel">
+          <div class="gl"><svg id="reticle" width="23" height="23" viewBox="0 0 23 23" aria-hidden="true" style="color:var(--accent)">
+            <circle cx="11.5" cy="11.5" r="7" stroke="currentColor" fill="none"/>
+            <path d="M11.5 0v5M11.5 18v5M0 11.5h5M18 11.5h5" stroke="currentColor"/></svg></div>
+          <div class="vr"></div>
+          <p class="t-caption sc">WORLOWIDE SHIPPING<br>FAST &amp; SECURE DELIVERY</p>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- ═══ 2 DETAILS ═══ -->
+    <section id="detPull" class="sec boxed"><div class="inner pad">
+      <div id="detHead"><span class="secIx t-caption">01 / DETAILS</span><h2 class="t-display sc">DETAILS MATTER.</h2></div>
+      <p id="detLede" class="t-lede muted up sc" style="top:calc(7.625rem + 5.6rem);left:2.5rem">A heavyweight layer built for cold mornings, long wear and everything that happens after the season turns.</p>
+      <ol id="detRows"></ol>
+      <a href="#" id="detCta" class="btn sc"><i></i><i></i><i></i><i></i>EXPLORE THE HOODIE
+        <svg class="arw" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 3h8M6 1l2 2-2 2" stroke="currentColor"/></svg></a>
+    </div></section>
+  </div>
+
+  <!-- ═══ 3 COLLECTIONS ═══ -->
+  <section class="sec boxed"><div class="inner pad">
+    <div id="colHead"><span class="secIx t-caption">02 / COLLECTIONS</span><h2 class="t-display sc">COLLECTIONS.</h2></div>
+    <p id="colLede" class="t-lede muted up sc">Heavyweight fleece for cold weather, movement and everyday use.</p>
+    <ul id="cards"></ul>
+    <div id="colCta"><a href="#" class="btn sc"><i></i><i></i><i></i><i></i>VIEW ALL HOODIES
+      <svg class="arw" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 3h8M6 1l2 2-2 2" stroke="currentColor"/></svg></a></div>
+  </div></section>
+
+  <!-- ═══ 4 TECHNOLOGY ═══ -->
+  <section id="tech"><div id="techStage" class="pad">
+    <div id="techHead"><span class="secIx t-caption">03 / TECHNOLOGY</span><h2 class="t-display sc">TECHNOLOGY<br>KNITTED TO ENDURE</h2></div>
+    <div id="reelBox"><canvas id="reel" width="768" height="768"
+      role="img" aria-label="The hoodie's five construction layers separating"></canvas></div>
+    <div id="techCards"></div>
+    <p id="techNote" class="t-lede muted up sc">Every detail has a purpose.<br>From the face of the knit to the loft held inside it, the hoodie is built<br>to last without losing its shape.</p>
+  </div></section>
+
+  <!-- ═══ 5 FAQ ═══ -->
+  <section class="sec boxed" style="overflow:hidden"><div class="inner pad">
+    <div id="faqStage" aria-hidden="true"><canvas id="faqCv"></canvas></div>
+    <div id="faqHead"><span class="secIx t-caption">04 / SUPPORT</span><h2 class="t-display sc">NEED TO KNOW.</h2></div>
+    <dl id="faqList"></dl>
+  </div></section>
+
+  <!-- ═══ 6 FOOTER ═══ -->
+  <footer id="foot" class="pad">
+    <svg id="footLogo" viewBox="0 0 40 99" fill="none" aria-hidden="true">
+      <rect x=".5" y=".5" width="39" height="98" stroke="currentColor"/>
+      <path d="M9 19h22M9 35h22M9 51h22M9 67h15M9 83h22" stroke="currentColor" stroke-width="2"/></svg>
+    <div id="footCols"></div>
+    <form id="news">
+      <label for="mail" class="t-body sc">STAY AHEAD OF THE DROP.</label>
+      <div class="field">
+        <input id="mail" type="email" autocomplete="email" placeholder="Your e-mail">
+        <button type="submit"><span class="vh">Subscribe</span>
+          <svg class="arw" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 3h8M6 1l2 2-2 2" stroke="currentColor"/></svg></button>
+      </div>
+      <div id="consent"><input id="agree" type="checkbox">
+        <label for="agree" class="t-fine faint up">I agree to receive updates.</label></div>
+    </form>
+    <div id="footRule"></div>
+    <div id="footEnd" class="t-caption faint">
+      <span class="sc">© 2026 BASALT. ALL RIGHTS RESERVED.</span>
+      <span class="sc">INSTAGRAM / YOUTUBE / TIK-TOK</span>
+    </div>
+  </footer>
+  </main>
+</div>
+
+<div id="curtain" data-preloader>
+  <b></b><b></b><b></b><b></b>
+  <div id="curtainIn">
+    <svg class="mk" viewBox="0 0 40 99" fill="none" aria-hidden="true">
+      <rect x=".5" y=".5" width="39" height="98" stroke="currentColor"/>
+      <path d="M9 19h22M9 35h22M9 51h22M9 67h15M9 83h22" stroke="currentColor" stroke-width="2"/></svg>
+    <div id="track"><div id="fill"></div></div>
+    <div id="count">LOADING 000</div>
+  </div>
+</div>
+<noscript><style>[data-preloader]{display:none!important}</style></noscript>
+<div id="failbar" role="alert" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:120;
+  padding:.75rem 1rem;background:#3a0d0d;color:#ffd9d9;font:12px/1.4 var(--mono)"></div>
+<script type="importmap">
+{"imports":{
+ "three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js",
+ "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/",
+ "lenis":"https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs"}}
+</script>
+<script type="module">
+import Lenis from 'lenis';
+
+const RM     = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COARSE = matchMedia('(hover: none) and (pointer: coarse)').matches;
+const FRAME  = () => matchMedia('(min-width:1024px) and (min-aspect-ratio:1/1)').matches;
+
+/* ═══ ONE SHARED rAF TICKER ══════════════════════════════════════════════
+   A Set of subscribers, each with its own minimum frame gap read live. The loop
+   starts on the first subscriber and cancels when the last leaves, and one
+   subscriber throwing must not kill it. DO NOT START A SECOND rAF LOOP ANYWHERE. */
+const subs = new Set(); let raf = 0, last = 0;
+function loop(now){
+  raf = requestAnimationFrame(loop);
+  const dt = last ? now - last : 16.7; last = now;
+  for (const s of subs){
+    if (s.gap && now - s.t < s.gap()) continue;
+    s.t = now;
+    try { s.fn(now, dt); } catch (e) { console.error(e); }
+  }
+}
+const sub = (fn, gap) => { const s = { fn, gap, t: 0 }; subs.add(s);
+  if (!raf) { last = 0; raf = requestAnimationFrame(loop); } return () => {
+    subs.delete(s); if (!subs.size && raf) { cancelAnimationFrame(raf); raf = 0; } }; };
+
+function fail(url){
+  const b = document.getElementById('failbar');
+  b.style.display = 'block';
+  b.textContent = 'FAILED TO LOAD  ' + url;
+}
+
+/* ═══ THE POINTER FIELD ══════════════════════════════════════════════════
+   One writer for the whole page. Parked off-screen so nothing is lit before the
+   pointer has been seen, and it LANDS on the first reading rather than easing in
+   from off-screen. No pointerleave handler: sending the coordinates away makes the
+   glow SLIDE off rather than stop. */
+if (!COARSE && !RM){
+  const LERP = .12, LAG = .045;
+  const fl = (k, dt) => 1 - Math.pow(1 - k, dt / (1000/60));
+  let tx = 0, ty = 0, x = 0, y = 0, lx = 0, ly = 0, seen = false;
+  addEventListener('pointermove', (e) => {
+    tx = e.clientX; ty = e.clientY;
+    if (!seen){ seen = true; x = lx = tx; y = ly = ty; }
+  }, { passive:true });
+  const r = document.documentElement.style;
+  sub((now, dt) => {
+    if (!seen) return;
+    const a = fl(LERP, dt), b = fl(LAG, dt);
+    x += (tx - x) * a; y += (ty - y) * a;
+    lx += (tx - lx) * b; ly += (ty - ly) * b;
+    r.setProperty('--pointer-x', x.toFixed(1) + 'px');
+    r.setProperty('--pointer-y', y.toFixed(1) + 'px');
+    r.setProperty('--pointer-lag-x', lx.toFixed(1) + 'px');
+    r.setProperty('--pointer-lag-y', ly.toFixed(1) + 'px');
+  });
+}
+
+/* ═══ THE SCRAMBLE DECODER ═══════════════════════════════════════════════
+   The page's signature. Resolution runs LEFT TO RIGHT one step at a time; every
+   unresolved character is a random glyph and WHITESPACE IS HELD FIXED, so on a
+   monospaced face the word shapes and wrap points are identical on every step.
+   The tick rate never changes, so a long label and a short one share one texture. */
+const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>';
+const STEP_MS = 40, MAX_STEPS = 22;
+const rnd = () => CHARACTERS[(Math.random() * CHARACTERS.length) | 0];
+
+/* function words are tied to what follows them: in a monospaced face a hanging
+   "and" is a visible stub of identical cells at the edge of the column */
+const TIED = new Set(('a an the and or but as if so of to in on at by for with from into over ' +
+ 'under per via no not without within onto upon against across around after before through ' +
+ 'during between is are was be we it its my our your their his her i can may do does did has ' +
+ 'have had will &').split(' '));
+function bind(text, narrow){
+  const words = text.split(' ');
+  let out = '';
+  for (let i = 0; i < words.length; i++){
+    const w = words[i];
+    out += w;
+    if (i === words.length - 1) break;
+    const bare = w.toLowerCase().replace(/[^a-z&]/g, '');
+    const punct = /[.,;:!?]$/.test(w);
+    const nextBare = words[i+1].toLowerCase().replace(/[^a-z&]/g,'');
+    const chain = TIED.has(nextBare);
+    const tooLong = narrow && (w.length + 1 + words[i+1].length) > 20;
+    out += (TIED.has(bare) && !punct && !(narrow && (chain || tooLong))) ? ' ' : ' ';
+  }
+  return out;
+}
+function keepSentences(text){
+  /* every space non-breaking except after a full stop — the sentences are the
+     only hinges, so a hand-set claim cannot split mid-sentence on a phone */
+  return text.replace(/(?<!\.)\s+/g, ' ');
+}
+
+const decoders = new WeakMap();
+function prep(el){
+  if (decoders.has(el)) return decoders.get(el);
+  const narrow = innerWidth < 640;
+  /* Walk the child nodes so <br> survives — rebuilding from textContent alone
+     destroys every hand-set line break on the page. */
+  const parts = [];
+  for (const n of Array.from(el.childNodes)){
+    if (n.nodeType === 3){
+      let t = n.textContent;
+      if (el.hasAttribute('data-keep')) t = keepSentences(t.trim());
+      else if (t.trim().split(/\s+/).length > 3) t = bind(t.replace(/\s+/g,' ').trim(), narrow);
+      parts.push({ br:false, text:t });
+    } else if (n.nodeName === 'BR') parts.push({ br:true });
+    else parts.push({ br:false, text:n.textContent });
+  }
+  const plain = parts.map(p => p.br ? ' ' : p.text).join('');
+  el.textContent = '';
+  const vis = document.createElement('span');
+  vis.setAttribute('aria-hidden','true');
+  const sr = document.createElement('span');
+  sr.className = 'vh'; sr.textContent = plain;
+  el.append(vis, sr);
+  const rec = { parts, vis, len: parts.reduce((a,p) => a + (p.br ? 0 : p.text.length), 0),
+                done:false, running:false, stop:null };
+  decoders.set(el, rec);
+  render(rec, rec.len);                                   // start fully resolved
+  return rec;
+}
+function render(rec, resolved){
+  let seen = 0, html = '';
+  for (const p of rec.parts){
+    if (p.br){ html += '<br>'; continue; }
+    let s = '';
+    for (const ch of p.text){
+      /* whitespace is HELD FIXED, so on a monospaced face the word shapes and
+         wrap points are identical on every step of the decode */
+      s += (ch === ' ' || ch === '\u00a0') ? ch : (seen < resolved ? ch : rnd());
+      seen++;
+    }
+    html += s;
+  }
+  rec.vis.innerHTML = html;
+}
+function decode(el){
+  if (RM) return;
+  const rec = prep(el);
+  if (rec.running) return;
+  rec.running = true;
+  const per = Math.max(1, Math.ceil(rec.len / MAX_STEPS));
+  let resolved = 0, acc = 0;
+  const off = sub((now, dt) => {
+    acc += dt;
+    while (acc >= STEP_MS){ acc -= STEP_MS; resolved += per; }
+    render(rec, Math.min(resolved, rec.len));
+    if (resolved >= rec.len){ rec.running = false; off(); }
+  });
+  rec.stop = off;
+}
+document.querySelectorAll('.sc').forEach(el => {
+  prep(el);
+  el.addEventListener('mouseenter', () => decode(el));
+  el.addEventListener('focus', () => decode(el), true);
+});
+
+/* ═══ REVEAL ON ARRIVAL ══════════════════════════════════════════════════
+   TWO observers, whichever fires first, and this is not redundancy: anything
+   anchored near the bottom of a viewport-tall section comes to rest closer to the
+   bottom edge than a hold-back margin is deep and never reveals at all. */
+function onArrive(el, cb){
+  let fired = false;
+  const go = () => { if (fired) return; fired = true; a.disconnect(); b.disconnect(); cb(); };
+  const a = new IntersectionObserver(e => e[0].isIntersecting && go(),
+    { rootMargin:'0px 0px -64px 0px' });
+  const b = new IntersectionObserver(e => e[0].isIntersecting && go(), { threshold:1 });
+  a.observe(el); b.observe(el);
+}
+document.querySelectorAll('.sc').forEach(el => onArrive(el, () => decode(el)));
+
+/* ═══ SECTION CONTENT ════════════════════════════════════════════════════ */
+const DETAILS = [
+  ['01','HEAVY GAUGE FACE','430 gsm loopback knit that holds its shape through repeated wear.'],
+  ['02','THERMAL LOFT','Brushed interior traps heat without adding bulk or unnecessary weight.'],
+  ['03','REINFORCED CONSTRUCTION','Flatlock seams and a taped yoke for added strength.'],
+  ['04','FUNCTIONAL STORAGE','A bar-tacked kangaroo pocket, deep enough to actually be useful.'],
+  ['05','OVERSIZED FIT','Relaxed silhouette for movement, layering and everyday comfort.'],
+];
+const CARDS = [
+  ['01','HEAVY GAUGE HOODIE','$220','c-slate', ['OVERSIZED FIT','LIMITED QUANTITY']],
+  ['02','THERMAL LOFT HOODIE','$245','c-amber', ['LAYERING PIECE','UTILITY']],
+  ['03','UTILITY ZIP HOODIE','$265','c-petrol',['THERMAL LOFT','WINDPROOF']],
+  ['04','SHELL LINED HOODIE','$290','c-bone',  ['WATER-RESISTANT','BREATHABLE']],
+];
+const SWATCH_SRC = ['c-slate','c-amber','c-petrol','c-bone'];
+const TECH = [
+  ['01','FACE YARN','Long-staple cotton, ring-spun and knitted slow.'],
+  ['02','LOOPBACK TERRY','Uncut loops on the inside face, flat on the outside.'],
+  ['03','BRUSHED LOFT','Raised fibres that hold air, which is what holds heat.'],
+  ['04','RIB STRUCTURE','2x2 at the cuff and hem, so it sits where you put it.'],
+  ['05','SEAM TAPE','A taped yoke across the back, where the weight hangs.'],
+];
+const FAQ = [
+  ['01','HOW DO I CHOOSE THE RIGHT SIZE?','Check our size guide for measurements and fit information. The hoodies are cut oversized for comfortable layering.'],
+  ['02','WHAT MATERIALS ARE USED IN THE HOODIES?','We use long-staple cotton, loopback terry and a brushed interior for durability, warmth and comfort.'],
+  ['03','HOW SHOULD I CARE FOR MY HOODIE?','Wash cold and dry flat. Avoid harsh detergents and excessive heat to preserve the loft.'],
+  ['04','DO YOU SHIP INTERNATIONALLY?','Yes. We offer worldwide shipping with secure delivery and tracking on every order.'],
+  ['05','CAN I RETURN OR EXCHANGE MY ORDER?','Yes. Unworn hoodies can be returned or exchanged within the specified return period.'],
+];
+const FOOTCOLS = [
+  ['SHOP',['CORE','HEAVY','LIMITED']],
+  ['TECHNOLOGY',['MATERIALS','CONSTRUCTION']],
+  ['ABOUT',[]],
+  ['SUPPORT',['PRIVACY POLICY','Terms & Conditions','SIZE GUIDE','SHIPPING & RETURNS','FAQ']],
+];
+const ARROW = '<svg class="arw" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M0 3h8M6 1l2 2-2 2" stroke="currentColor"/></svg>';
+
+/* details rows — a left rail with space-between pins the numeral to the top and
+   the icon to the bottom, which is why the rows are NOT all the same height */
+document.getElementById('detRows').innerHTML = DETAILS.map(([n,t,b]) => `
+  <li class="drow panel">
+    <div class="rail"><span class="t-body ix" aria-hidden="true">${n}</span>
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" style="margin-top:calc(1.125rem * .155)">
+        <rect x="4.5" y="4.5" width="23" height="23" stroke="currentColor" fill="none"/>
+        <path d="M10 16h12M16 10v12" stroke="currentColor"/></svg></div>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <span class="t-body sc">${t}</span>
+      <span class="t-body muted up sc">${b}</span></div>
+  </li>`).join('');
+
+document.getElementById('cards').innerHTML = CARDS.map(([n,t,p,img,tags], i) => `
+  <li class="stage" style="perspective:60rem">
+    <div class="card surface panel" data-i="${i}">
+      <div class="cardLayer" aria-hidden="true">
+        ${SWATCH_SRC.map((s,j) => `<img src="assets/img/${j===0?img:s}.webp" alt="" class="${j===0?'on':''}">`).join('')}
+      </div>
+      <div class="cardTop">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <span class="t-body ix">${n}</span>
+          <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><path d="M13 0v13H0" stroke="currentColor" fill="none"/></svg>
+        </div>
+        <div class="cardTitle" style="display:flex;flex-direction:column;gap:.45rem;margin-top:1.25rem">
+          <span class="t-title sc">${t}</span>
+          <span class="t-body muted sc">${p}</span></div>
+      </div>
+      <div class="swatches" role="group" aria-label="View">
+        ${SWATCH_SRC.map((s,j)=>`<button type="button" aria-label="View ${j+1}" aria-current="${j===0}"></button>`).join('')}
+      </div>
+      <div class="cardBot">
+        <div class="chips t-chip">${tags.map(x=>`<span class="sc">${x}</span>`).join('')}</div>
+        <div class="shop t-chip"><a href="#" class="sc">SHOP NOW ${ARROW}</a></div>
+      </div>
+    </div>
+  </li>`).join('');
+
+document.getElementById('techCards').innerHTML = TECH.map(([n,t,b],i) => `
+  <div class="tcard panel ${i===0?'on':''}" data-i="${i}">
+    <span class="t-body ix" aria-hidden="true">${n}</span>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <span class="t-body sc">${t}</span>
+      <span class="t-body muted up sc">${b}</span></div>
+  </div>`).join('');
+
+document.getElementById('faqList').innerHTML = FAQ.map(([n,q,a],i) => `
+  <div class="frow panel${i===1?' wide':''}">
+    <dt><span class="q t-body sc">${q}</span><span class="t-body ix" aria-hidden="true">${n}</span></dt>
+    <dd class="t-body muted up sc">${a}</dd>
+  </div>`).join('');
+
+document.getElementById('footCols').innerHTML = FOOTCOLS.map(([h,ls]) => `
+  <div><h3 class="t-body sc">${h}</h3>${ls.map(l=>`<a href="#" class="t-body sc">${l}</a>`).join('')}</div>`).join('');
+
+document.querySelectorAll('.sc').forEach(el => {
+  if (decoders.has(el)) return;
+  prep(el);
+  el.addEventListener('mouseenter', () => decode(el));
+  el.addEventListener('focus', () => decode(el), true);
+  onArrive(el, () => decode(el));
+});
+
+/* ═══ CARD SWATCHES + TILT ═══════════════════════════════════════════════ */
+document.querySelectorAll('.card').forEach(card => {
+  const imgs = card.querySelectorAll('.cardLayer img');
+  card.querySelectorAll('.swatches button').forEach((b, j) => {
+    b.addEventListener('click', () => {
+      card.querySelectorAll('.swatches button').forEach(o => o.setAttribute('aria-current','false'));
+      b.setAttribute('aria-current','true');
+      /* every view is RENDERED and cross-faded, never swapped — the card must
+         never flash an empty box while a photograph decodes */
+      imgs.forEach((im, k) => im.classList.toggle('on', k === j));
+    });
+  });
+  if (COARSE || RM) return;
+  const layer = card.querySelector('.cardLayer');
+  let nx = 0, ny = 0, vx = 0, vy = 0, cx = 0, cy = 0, off = null;
+  const step = () => {
+    /* tension 170, friction 26, mass 1 — no overshoot. Slower than a hover fade
+       on purpose: the cursor is a noisy input and the box is large. */
+    vx += (nx - cx) * .0472; vy += (ny - cy) * .0472;
+    vx *= .86; vy *= .86; cx += vx; cy += vy;
+    /* the corner UNDER the cursor goes away, so the card leans TOWARDS the hand */
+    card.style.transform = `rotateX(${(-cy*6.5).toFixed(2)}deg) rotateY(${(cx*6.5).toFixed(2)}deg)`;
+    layer.style.transform = `translate3d(${(cx*.55).toFixed(3)}rem,${(cy*.385).toFixed(3)}rem,2.5rem)`;
+    if (Math.abs(vx)+Math.abs(vy) < 1e-4 && Math.abs(nx-cx)+Math.abs(ny-cy) < 1e-3){ off && off(); off = null; }
+  };
+  card.style.transformStyle = 'preserve-3d';
+  layer.style.transform = 'translate3d(0,0,2.5rem)';
+  const wake = () => { if (!off) off = sub(step); };
+  card.parentElement.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    nx = Math.max(-1, Math.min(1, (e.clientX - r.left) / r.width * 2 - 1));
+    ny = Math.max(-1, Math.min(1, (e.clientY - r.top) / r.height * 2 - 1));
+    wake();
+  }, { passive:true });
+  card.parentElement.addEventListener('pointerleave', () => { nx = 0; ny = 0; wake(); });
+});
+
+/* ═══ NAV SUBMENU ════════════════════════════════════════════════════════
+   Focus does NOT open it, activation does: tapping a button focuses it and THEN
+   clicks it, and opening on focus while toggling on click cancels inside one tap. */
+{
+  const item = document.querySelector('.navItem'), btn = document.getElementById('colBtn');
+  const caret = btn.querySelector('.caret');
+  let t = 0;
+  const set = (on) => {
+    item.dataset.open = on; btn.setAttribute('aria-expanded', on);
+    caret.style.transform = on ? 'rotate(180deg)' : '';
+  };
+  btn && btn.addEventListener('click', () => set(item.dataset.open !== 'true'));
+  item && item.addEventListener('pointerenter', () => { clearTimeout(t); set(true); });
+  item && item.addEventListener('pointerleave', () => { t = setTimeout(() => set(false), 220); });
+  addEventListener('keydown', e => e.key === 'Escape' && set(false));
+  addEventListener('pointerdown', e => { if (item && !item.contains(e.target)) set(false); });
+  item && item.addEventListener('focusout', e => { if (!item.contains(e.relatedTarget)) set(false); });
+}
+{
+  const b = document.getElementById('burger'), m = document.getElementById('menu');
+  b.addEventListener('click', () => {
+    const on = m.classList.toggle('on');
+    b.setAttribute('aria-expanded', on);
+  });
+  m.addEventListener('click', e => { if (e.target.tagName === 'A'){ m.classList.remove('on');
+    b.setAttribute('aria-expanded','false'); } });
+}
+document.getElementById('news').addEventListener('submit', e => e.preventDefault());
+
+/* ═══ THE HERO PLATE TORCH ═══════════════════════════════════════════════ */
+{
+  const rest = document.getElementById('plateRest'), lit = document.getElementById('plateLit');
+  const wrap = document.getElementById('plateWrap');
+  const place = () => {
+    for (const el of [rest, lit]){
+      el.style.position = 'absolute';
+      el.style.left = '50%'; el.style.top = 'calc(50% + 1.21875rem)';
+      el.style.width = FRAME() ? '92%' : '108.39%';
+      el.style.transform = 'translate(-50%,-50%)';
+    }
+  };
+  place(); addEventListener('resize', place, { passive:true });
+  rest.style.opacity = '.2';
+  lit.style.opacity = '1';
+  lit.style.filter = 'brightness(2.6) contrast(1.1)';
+  if (RM){ lit.style.display = 'none'; }
+  else if (COARSE){
+    /* where there is no cursor the aperture is a SLANTED SWEEP, because a sweep is
+       what reads as a highlight travelling over metal; a spot reads as a torch */
+    sub((now) => {
+      const p = (now % 7400) / 7400;
+      const x = p < (2600/7400) ? (p / (2600/7400)) : 1.6;
+      lit.style.maskImage = lit.style.webkitMaskImage =
+        `linear-gradient(100deg, transparent ${(x*160-60).toFixed(1)}%, rgb(0 0 0 / .35) ${(x*160-42).toFixed(1)}%, #000 ${(x*160-30).toFixed(1)}%, rgb(0 0 0 / .35) ${(x*160-18).toFixed(1)}%, transparent ${(x*160).toFixed(1)}%)`;
+      /* a DIFFERENT period from the sweep, so the pair never pulses together */
+      rest.style.opacity = (0.2 * (0.8 + 0.9 * (0.5 + 0.5*Math.sin(now/6700*Math.PI*2)))).toFixed(3);
+    }, () => 33);
+  } else {
+    sub((now) => {
+      const r = wrap.getBoundingClientRect();
+      const px = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pointer-x')) || -9999;
+      const py = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pointer-y')) || -9999;
+      const rad = Math.min(260, 0.42 * Math.max(lit.clientWidth, lit.clientHeight));
+      const lr = lit.getBoundingClientRect();
+      const mx = px - lr.left, my = py - lr.top;
+      lit.style.maskImage = lit.style.webkitMaskImage =
+        `radial-gradient(circle ${rad.toFixed(0)}px at ${mx.toFixed(0)}px ${my.toFixed(0)}px, #000 0%, rgb(0 0 0 / .75) 45%, transparent 100%)`;
+      rest.style.opacity = (0.2 * (0.8 + 0.9 * (0.5 + 0.5*Math.sin(now/6700*Math.PI*2)))).toFixed(3);
+    }, () => 33);
+  }
+}
+
+/* ═══ THE CORNER GLYPH IDLES ═════════════════════════════════════════════ */
+if (!RM){
+  const globe = document.getElementById('globe'), ret = document.getElementById('reticle');
+  let onScreen = false;
+  new IntersectionObserver(e => onScreen = e[0].isIntersecting).observe(globe);
+  sub((now) => {
+    if (!onScreen) return;
+    /* a REAL rotateY under a short perspective: both a scaleX and a turn narrow
+       the glyph, but only perspective grows the near edge while the far shrinks,
+       and that asymmetry is what reads as a turn rather than a squash. It swings
+       either side of face-on — past 90 deg a flat glyph mirrors. */
+    globe.style.transform = `perspective(110px) rotateY(${(Math.sin(now/3400*Math.PI*2)*58).toFixed(2)}deg)`;
+    /* a sight is AIMED, not swept: sharp rise, slower fall, then rest */
+    const ph = (now % 2400) / 2400;
+    let env = ph < .1 ? ph/.1 : ph < .42 ? 1 - (ph-.1)/.32 : 0;
+    env = env*env*(3-2*env);
+    ret.style.transform = `scale(${(1 + env*.16).toFixed(3)})`;
+    ret.style.opacity = (0.78 + 0.22*env).toFixed(3);
+  }, () => 33);
+}
+
+/* ═══ SMOOTH SCROLL ══════════════════════════════════════════════════════ */
+if (!RM){
+  const lenis = new Lenis({ lerp: .075, smoothWheel: true, syncTouch: !COARSE });
+  sub((now) => lenis.raf(now));
+}
+scrollTo(0, 0);
+
+/* ═══ THE CURTAIN ════════════════════════════════════════════════════════
+   Gated on real readiness, not a timer: a duration is a promise about the network
+   that nothing can keep. The readout CHASES the target and creeps toward the next
+   gate rather than sitting still, so it reads as something filling. */
+{
+  const PATIENCE_MS = 8000, FLOOR_MS = 700, COUNT_LERP = .08;
+  const el = document.getElementById('curtain'), fill = document.getElementById('fill'),
+        count = document.getElementById('count');
+  const t0 = performance.now();
+  let gates = 0; const TOTAL = 3, mark = () => { gates++; };
+  document.fonts.ready.then(mark);
+  if (document.readyState === 'complete') mark(); else addEventListener('load', mark);
+  addEventListener('hero-scene-ready', mark, { once:true });
+  setTimeout(() => { gates = TOTAL; }, PATIENCE_MS);
+  let shown = 0, closed = false;
+  const off = sub((now, dt) => {
+    const target = gates / TOTAL, finished = gates >= TOTAL;
+    const ceiling = finished ? 1 : Math.min(.97, target + .12);
+    shown += (Math.min(ceiling, Math.max(target, shown + .0015)) - shown)
+           * (1 - Math.pow(1 - COUNT_LERP, dt / (1000/60)));
+    fill.style.transform = `scaleX(${shown.toFixed(4)})`;
+    count.textContent = 'LOADING ' + String(Math.round(shown * 100)).padStart(3,'0');
+    if (finished && shown > .995 && now - t0 > FLOOR_MS && !closed){
+      closed = true; el.classList.add('out');
+      document.documentElement.classList.add('ready');
+      window.__ready = true;
+      setTimeout(() => el.remove(), 700);
+      off();
+    }
+  });
+}
+
+/* ═══ THE SCRUBBED REEL ══════════════════════════════════════════════════
+   Scrubbed, NOT played, and drawn on a canvas over decoded stills rather than a
+   <video> whose currentTime is written: a decoder serves whole pictures at
+   whatever rate it can, and the reader's scroll does not land on picture
+   boundaries. drawImage of two already-decoded frames is synchronous and can show
+   the picture BETWEEN two frames rather than the nearer of them. */
+{
+  const COUNT = 61, SIDE = 768, CONC = 6, SEEK_FOLLOW = .45, ENTRY_LEAD = 1, RELEASE_LAG = .15;
+  const cv = document.getElementById('reel');
+  const ctx = cv.getContext('2d', { alpha:true, desynchronized:true });
+  ctx.globalCompositeOperation = 'lighter';        // set ONCE, never per frame
+  const frames = new Array(COUNT).fill(null);
+  const sec = document.getElementById('tech');
+  const cards = [...document.querySelectorAll('.tcard')];
+  let head = 0, play = 0, ready = false;
+
+  const url = i => `assets/reel/${String(i).padStart(3,'0')}.webp`;
+  (async () => {
+    let next = 0, live = 0;
+    await new Promise(res => {
+      const pump = () => {
+        while (live < CONC && next < COUNT){
+          const i = next++; live++;
+          fetch(url(i)).then(r => r.ok ? r.blob() : Promise.reject(url(i)))
+            /* createImageBitmap decodes on a WORKER thread; a plain <img> defers
+               its decode to the first drawImage, which is synchronous and on the
+               main thread — exactly the stall this design removes */
+            .then(b => createImageBitmap(b)).then(bm => { frames[i] = bm; })
+            .catch(e => { if (i === 0) fail(String(e)); })
+            .finally(() => { live--; if (next >= COUNT && live === 0) res(); else pump(); });
+        }
+      };
+      pump();
+    });
+    ready = frames.some(Boolean);
+    draw();
+  })();
+
+  const at = i => {                       /* outward neighbour search for a hole */
+    for (let d = 0; d < COUNT; d++){
+      if (frames[i+d]) return frames[i+d];
+      if (frames[i-d]) return frames[i-d];
+    }
+    return null;
+  };
+  function draw(){
+    if (!ready) return;
+    const f = play * (COUNT - 1), i = Math.floor(f), t = f - i;
+    const a = at(i), b = at(Math.min(COUNT - 1, i + 1));
+    if (!a) return;
+    ctx.clearRect(0, 0, SIDE, SIDE);
+    /* the weights sum to one so nothing clips, and `lighter` interpolates colour
+       AND alpha in premultiplied space, which is the correct dissolve. Under the
+       default source-over, where B is transparent A survives at full strength and
+       the stack's old position never leaves. */
+    ctx.globalAlpha = 1 - t; ctx.drawImage(a, 0, 0, SIDE, SIDE);
+    ctx.globalAlpha = t;     ctx.drawImage(b || a, 0, 0, SIDE, SIDE);
+  }
+  sub((now, dt) => {
+    const r = sec.getBoundingClientRect();
+    const span = r.height - innerHeight;
+    const raw = span > 0 ? (-r.top + innerHeight * 0) / span : 0;
+    head = Math.max(0, Math.min(1, raw));
+    const k = 1 - Math.pow(1 - SEEK_FOLLOW, dt / (1000/60));
+    const prev = play; play += (head - play) * k;
+    if (Math.abs(play - prev) > 1/255 || !prev) draw();
+    const idx = Math.max(0, Math.min(cards.length - 1, Math.round(play * (cards.length - 1))));
+    cards.forEach((c, i) => c.classList.toggle('on', i === idx));
+  });
+}
+
+/* ═══ THE WEBGL PRODUCT ══════════════════════════════════════════════════
+   ONE canvas, ONE context, ONE ticker subscription for the whole journey across
+   two screens. The garment never changes hands — only its framing does. */
+import * as THREE from 'three';
+import { GLTFLoader }  from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const FW = 1440, FH = 800;
+const SUBJECT_HEIGHT = 570, SUBJECT_RISE = 36;
+const DETAILS_HEIGHT = 795, DETAILS_DROP = 140, DETAILS_SHIFT_X = -92;
+const SCROLL_TURN = 40 * Math.PI/180;
+const BOXED_FILL_Y = .97, BOXED_FILL_X = .93;
+const TURN_MAX = 24*Math.PI/180, ROLL_MAX = 12*Math.PI/180, PARALLAX = 12;
+const TILT_K = .08, TILT_D = .52;
+const RELEASE_LAG = .15;
+const smoother = t => t*t*t*(t*(t*6-15)+10);
+const drift = t => 1 - Math.pow(1 - t, 2.2);
+const RATIO_STEPS = { mobile:[1,.85,.75], tablet:[1.25,1,.85], desktop:[1.5,1.25,1] };
+const FRAME_BUDGET = { mobile:1000/30, tablet:1000/45, desktop:0 };
+const tier = !COARSE ? 'desktop' : (innerWidth < 768 ? 'mobile' : 'tablet');
+
+const draco = new DRACOLoader().setDecoderPath(
+  'https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/libs/draco/gltf/');
+const gltfL = new GLTFLoader().setDRACOLoader(draco);
+
+/* ARTEFAKT's product is a lacquered iridescent shell, which needs the iridescence
+   layer. A hoodie is the opposite material: matte brushed fleece. The equivalent
+   load-bearing parameter here is SHEEN — the retroreflective lift off raised
+   fibres at grazing angles. Without it a matte mesh reads as clay. */
+const LOOK = { color:0x2b333a, metalness:0, roughness:.92,
+  sheen:.5, sheenRoughness:.8, sheenColor:new THREE.Color(0xffd9c0), envMapIntensity:.45 };
+
+function makeProduct(canvas, src, still){
+  const rend = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:!COARSE,
+    powerPreference: COARSE ? 'default' : 'high-performance', stencil:false });
+  rend.setClearAlpha(0); rend.autoClear = false;
+  rend.outputColorSpace = THREE.SRGBColorSpace;
+  rend.toneMapping = THREE.ACESFilmicToneMapping; rend.toneMappingExposure = .95;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, .1, 100);
+  scene.environment = new THREE.PMREMGenerator(rend).fromScene(new RoomEnvironment(), .04).texture;
+  scene.environmentIntensity = .40;
+  /* ARTEFAKT carries its blue in the KEY, not the material, because a neutral
+     environment cannot make two thirds of an image one hue. Same trick, amber. */
+  const key = new THREE.DirectionalLight(0xff7a33, 2.35); key.position.set(-2.4, 2.2, 2.6);
+  const rim = new THREE.DirectionalLight(0x9fd6ff, 2.9); rim.position.set(2.8, .6, -2.2);
+  scene.add(key, rim);
+
+  /* TWO PIVOTS, and the nesting is load-bearing: the roll is OUTERMOST so it
+     always reads as a roll on screen; the turntable sits inside it, in the
+     product's own frame. Swap them and a rolled product turns about a tilted
+     axis and the two visibly fight. */
+  const roll = new THREE.Group(), turn = new THREE.Group();
+  roll.add(turn); scene.add(roll);
+  const model = src.clone(true);
+  const uLag = { value: 0 };
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
+  model.position.sub(ctr);                       // recentre BEFORE adding
+  model.traverse(o => {
+    if (!o.isMesh) return;
+    const m = new THREE.MeshPhysicalMaterial({ ...LOOK });
+    /* The GLB has no rig, so ARTEFAKT's named bone chains do not exist here. The
+       trail is a vertex bend about the shoulder line instead, growing toward the
+       hem, driven by the same jiggle scalar. */
+    m.onBeforeCompile = sh => {
+      sh.uniforms.uLag = uLag;
+      const h = Math.max(size.y, .001);
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', `#include <common>\nuniform float uLag;`)
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          float _ly = clamp(position.y / ${h.toFixed(4)} + .5, 0., 1.);
+          float _a = uLag * (1.0 - _ly) * (1.0 - _ly);
+          transformed.xy = mat2(cos(_a),-sin(_a),sin(_a),cos(_a)) * transformed.xy;`);
+    };
+    o.material = m;
+  });
+  turn.add(model);
+
+  let W = 0, H = 0, ratioIx = 0, needs = true, fps = [], lastFrame = 0;
+  const steps = RATIO_STEPS[tier];
+  function resize(){
+    const r = canvas.parentElement.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    /* Snap the buffer UP to a whole 50px cell and CENTRE the canvas — the snap
+       grows the buffer past its container by up to a cell in each axis, and left
+       at the default top-left that overhang all falls off the bottom-right and
+       pushes the product off centre. */
+    W = Math.ceil(r.width / 50) * 50; H = Math.ceil(r.height / 50) * 50;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    rend.setPixelRatio(steps[ratioIx]);
+    rend.setSize(W, H, false);
+    camera.aspect = W / H; camera.updateProjectionMatrix();
+    scene.userData.rawH = r.height; scene.userData.rawW = r.width;
+    needs = true;
+  }
+  const tiltX = { v:0, p:0 }, tiltY = { v:0, p:0 };
+  let px = 0, py = 0, active = 0, jig = 0, prevTurn = 0;
+
+  function frame(now, dt, journey, approach){
+    const rawH = scene.userData.rawH || H, scale = rawH / FH;
+    const fullBleed = FRAME();
+    let hUnits, rise, shiftX, turnY;
+    if (still){
+      const a = smoother(approach);
+      hUnits = still.height; rise = -still.offsetY / 1;
+      shiftX = still.offsetX + still.entrance.shiftX * (1 - a);
+      turnY = SCROLL_TURN + still.entrance.turn * (1 - a);
+    } else {
+      const d = drift(journey);
+      hUnits = SUBJECT_HEIGHT + (DETAILS_HEIGHT - SUBJECT_HEIGHT) * d;
+      rise   = SUBJECT_RISE + (-DETAILS_DROP - SUBJECT_RISE) * d;
+      shiftX = DETAILS_SHIFT_X * d;
+      turnY  = SCROLL_TURN * d;
+    }
+    const halfTan = Math.tan((30 * Math.PI/180) / 2);
+    const targetPx = fullBleed ? hUnits * scale : rawH * BOXED_FILL_Y;
+    const forH = (size.y * rawH) / (2 * targetPx * halfTan);
+    const forW = (size.x * rawH) / (2 * (scene.userData.rawW||W) * BOXED_FILL_X * halfTan);
+    /* fit the TIGHTER axis when boxed: sleeves out, the garment is wider than it
+       is tall and 97% of the height asks for more width than the box has */
+    const dist = fullBleed ? forH : Math.max(forH, forW);
+    camera.position.set(0, 0, dist); camera.lookAt(0, 0, 0);
+    const wpp = (2 * dist * halfTan) / rawH;
+
+    tiltY.v += ((px * TURN_MAX * active) - tiltY.p) * TILT_K; tiltY.v *= TILT_D; tiltY.p += tiltY.v;
+    tiltX.v += ((py * ROLL_MAX * active) - tiltX.p) * TILT_K; tiltX.v *= TILT_D; tiltX.p += tiltX.v;
+    const idle = Math.sin(now / 7000 * Math.PI * 2);
+    roll.rotation.z = tiltX.p;
+    turn.rotation.y = turnY + tiltY.p + idle * 1.5 * Math.PI/180;
+    roll.position.x = (shiftX + px * PARALLAX * active) * scale * wpp;
+    roll.position.y = (rise + idle * 4) * scale * wpp;
+
+    const tv = turn.rotation.y - prevTurn; prevTurn = turn.rotation.y;
+    jig += (((tiltY.v + tiltX.v) * 7 + tv * 1.5) - jig) * .18;
+    const lim = 30 * Math.PI/180;
+    uLag.value = lim * Math.tanh(jig * 1.6 / lim);
+    needs = true;
+  }
+  resize();
+  return { rend, scene, camera, resize, frame,
+    render(){ if (!needs) return; needs = false; rend.clear(); rend.render(scene, camera); },
+    setPointer(x, y, a){ px = x; py = y; active = a; },
+    compile(){ rend.compile(scene, camera); } };
+}
+
+(async function boot(){
+  let gltf;
+  try {
+    gltf = await new Promise((res, rej) =>
+      gltfL.load('assets/hoodie.glb', res, undefined, () => rej('assets/hoodie.glb')));
+  } catch (e){ fail(String(e)); dispatchEvent(new Event('hero-scene-ready')); return; }
+
+  const stage = document.getElementById('stage');
+  const hero = makeProduct(document.getElementById('stageCv'), gltf.scene, null);
+  let faq = null;
+  if (FRAME()){
+    const f = document.getElementById('faqStage');
+    const cv = document.createElement('canvas'); f.appendChild(cv);
+    faq = makeProduct(cv, gltf.scene,
+      { height:765, offsetX:-285, offsetY:-140, entrance:{ shiftX:-110, turn:-28*Math.PI/180 } });
+  }
+  hero.compile(); faq && faq.compile();
+  dispatchEvent(new Event('hero-scene-ready'));
+  requestAnimationFrame(() => stage.classList.add('on'));
+
+  const region = document.getElementById('region');
+  const faqSec = document.getElementById('faqStage')?.closest('section');
+  let visible = true;
+  new IntersectionObserver(e => visible = e[0].isIntersecting, { rootMargin:'10%' }).observe(region);
+
+  if (!COARSE) region.addEventListener('pointermove', e => {
+    const r = region.getBoundingClientRect();
+    hero.setPointer(
+      Math.max(-1, Math.min(1, (e.clientX - r.left) / r.width * 2 - 1)),
+      Math.max(-1, Math.min(1, (e.clientY - r.top) / r.height * 2 - 1)), 1);
+  }, { passive:true });
+
+  let lastT = 0;
+  sub((now, dt) => {
+    if (document.hidden) return;
+    const budget = FRAME_BUDGET[tier];
+    if (budget && now - lastT < budget) return; lastT = now;
+    if (visible){
+      const r = region.getBoundingClientRect();
+      const journey = Math.max(0, Math.min(1, -r.top / Math.max(1, region.offsetHeight)));
+      hero.frame(now, dt, journey, 1);
+      hero.render();
+    }
+    if (faq && faqSec){
+      const r = faqSec.getBoundingClientRect();
+      /* the approach starts while the screen is still coming up and finishes after
+         it has arrived, so the garment is still settling while the screen is read */
+      const a = Math.max(0, Math.min(1,
+        (innerHeight * .55 - r.top) / (innerHeight * .85)));
+      if (r.top < innerHeight && r.bottom > 0){ faq.frame(now, dt, 0, a); faq.render(); }
+    }
+  });
+
+  let rt = 0;
+  const onResize = () => { clearTimeout(rt); rt = setTimeout(() => {
+    hero.resize(); faq && faq.resize(); }, 150); };
+  /* orientationchange on a coarse pointer: iOS fires resize every time the URL bar
+     collapses during a scroll, and rebuilding the framebuffer mid-scroll reads as
+     a whole-scene flash */
+  addEventListener(COARSE ? 'orientationchange' : 'resize', onResize, { passive:true });
+})();
+</script>
+</body>
+</html>

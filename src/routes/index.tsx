@@ -1,6 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Navbar, Hero, Statement, CustomPrint, Culture, Shop, HowItWorks, Bulk, Why, Social, ContactSection, Footer, FloatingWhatsApp } from "@/components/site";
+import {
+  Navbar,
+  Hero,
+  HoodieSection,
+  FullSleeveSection,
+  CustomEnquiry,
+  Shop,
+  PrintArchive,
+  Why,
+  Bulk,
+  ContactSection,
+  Footer,
+  FloatingWhatsApp,
+} from "@/components/site";
 import { PRODUCTS, INSTAGRAM } from "@/lib/site-data";
+import { usePointerLattice } from "@/hooks/usePointerLattice";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+
+import heroImage from "@/assets/hero.jpg";
 
 const TITLE = "Vince Outlets | Custom T-Shirts & Streetwear in Puducherry";
 const DESC = "Vince Outlets offers custom printed T-shirts, hoodies, oversized tees and ready-to-wear streetwear in Puducherry. Order custom single pieces, squad merchandise and bulk clothing through WhatsApp.";
@@ -31,19 +48,44 @@ export const Route = createFileRoute("/")({
       { name: "twitter:description", content: DESC },
       { name: "twitter:image", content: "/og-image.png" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "preload", as: "image", href: heroImage, fetchPriority: "high" },
+    ],
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
   }),
   component: Index,
 });
 
 function Index() {
+  usePointerLattice();
+  useSmoothScroll();
+
   return (
-    <div className="grain overflow-x-hidden">
+    <div id="shell" className="grain">
+      <div id="beam" aria-hidden="true" />
       <Navbar />
-      <main>
-        <Hero /><Statement /><CustomPrint /><Culture /><Shop /><HowItWorks /><Bulk /><Why /><Social /><ContactSection />
+      <main className="relative z-10">
+        {/* 1. T-SHIRT — FIRST SECTION (HERO + DEDICATED 3D T-SHIRT BOX) */}
+        <Hero />
+        {/* 2. HOODIE — SECOND SECTION (DEDICATED 3D HOODIE BOX) */}
+        <HoodieSection />
+        {/* 3. FULL SLEEVE T-SHIRT — THIRD SECTION (DEDICATED 3D FULL SLEEVE BOX) */}
+        <FullSleeveSection />
+        {/* 4. CUSTOM SILHOUETTE WORKFLOW */}
+        <CustomEnquiry />
+        {/* 5. READY-TO-WEAR COLLECTION */}
+        <Shop />
+        {/* 6. BESPOKE PRINT ARCHIVE // COMPLETE GRAPHIC COLLECTION */}
+        <PrintArchive />
+        {/* 7. WHY VINCE OUTLETS */}
+        <Why />
+        {/* 8. BULK & SQUAD MERCH */}
+        <Bulk />
+        {/* 9. PUDUCHERRY STUDIO & CONTACT */}
+        <ContactSection />
       </main>
+      {/* FOOTER */}
       <Footer />
       <FloatingWhatsApp />
     </div>
