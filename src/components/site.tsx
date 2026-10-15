@@ -183,40 +183,30 @@ export interface ColorOption {
   bgHex: string;
 }
 
-export const TSHIRT_COLORS: ColorOption[] = [
-  { name: "Black", hex: "#141518", bgHex: "#141518" },
-  { name: "Red", hex: "#b31e28", bgHex: "#b31e28" },
-  { name: "Dark Blue / Navy", hex: "#162742", bgHex: "#162742" },
-  { name: "Orange", hex: "#e65c00", bgHex: "#e65c00" },
-  { name: "White", hex: "#f4f5f8", bgHex: "#f4f5f8" },
-  { name: "Charcoal Grey", hex: "#3c4149", bgHex: "#3c4149" },
+// Exact professional streetwear 6-colour palette across all 3 garments
+export const STREETWEAR_COLORS: ColorOption[] = [
+  { name: "Jet Black", hex: "#111111", bgHex: "#111111" },
+  { name: "Racing Red", hex: "#D71920", bgHex: "#D71920" },
+  { name: "Royal Navy Blue", hex: "#123B73", bgHex: "#123B73" },
+  { name: "Vibrant Orange", hex: "#F47721", bgHex: "#F47721" },
+  { name: "Heather Grey", hex: "#A7A9AC", bgHex: "#A7A9AC" },
+  { name: "Pure White", hex: "#FFFFFF", bgHex: "#FFFFFF" },
 ];
 
-export const HOODIE_COLORS: ColorOption[] = [
-  { name: "Black", hex: "#141518", bgHex: "#141518" },
-  { name: "Red", hex: "#b31e28", bgHex: "#b31e28" },
-  { name: "Dark Blue / Navy", hex: "#162742", bgHex: "#162742" },
-  { name: "Orange", hex: "#e65c00", bgHex: "#e65c00" },
-  { name: "Heather Grey", hex: "#7e848e", bgHex: "#7e848e" },
-  { name: "White", hex: "#f4f5f8", bgHex: "#f4f5f8" },
-];
+// Pure White (#FFFFFF) is the required default for all 3 products
+export const DEFAULT_GARMENT_COLOR: ColorOption = STREETWEAR_COLORS[5]!;
 
-export const FULLSLEEVE_COLORS: ColorOption[] = [
-  { name: "Black", hex: "#141518", bgHex: "#141518" },
-  { name: "Red", hex: "#b31e28", bgHex: "#b31e28" },
-  { name: "Dark Blue / Navy", hex: "#162742", bgHex: "#162742" },
-  { name: "Orange", hex: "#e65c00", bgHex: "#e65c00" },
-  { name: "White", hex: "#f4f5f8", bgHex: "#f4f5f8" },
-  { name: "Olive Green", hex: "#464f32", bgHex: "#464f32" },
-];
+export const TSHIRT_COLORS = STREETWEAR_COLORS;
+export const HOODIE_COLORS = STREETWEAR_COLORS;
+export const FULLSLEEVE_COLORS = STREETWEAR_COLORS;
 
 export function ColorSwatchPicker({
-  colors,
+  colors = STREETWEAR_COLORS,
   selectedColor,
   onSelectColor,
   label = "GARMENT COLOUR",
 }: {
-  colors: ColorOption[];
+  colors?: ColorOption[];
   selectedColor: ColorOption;
   onSelectColor: (c: ColorOption) => void;
   label?: string;
@@ -227,8 +217,12 @@ export function ColorSwatchPicker({
         <span className="text-[#a3a3a3] uppercase tracking-wider text-[11px] font-medium">
           {label}:
         </span>
-        <span className="text-[#F4D477] font-bold tracking-wider text-[11px] uppercase bg-[#0e1418] px-2 py-0.5 rounded-sm border border-[#D4A62A]/30">
-          {selectedColor.name}
+        <span className="inline-flex items-center gap-2 text-[#F4D477] font-bold tracking-wider text-[11px] uppercase bg-[#0e1418] px-2.5 py-1 rounded-sm border border-[#D4A62A]/40 shadow-sm">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full border border-white/30 shrink-0"
+            style={{ backgroundColor: selectedColor.bgHex }}
+          />
+          {selectedColor.name} • {selectedColor.hex}
         </span>
       </div>
 
@@ -238,32 +232,42 @@ export function ColorSwatchPicker({
         aria-label={label}
       >
         {colors.map((c) => {
-          const isSelected = selectedColor.name === c.name;
-          const isLight = c.hex === "#f4f5f8" || c.name.toLowerCase().includes("white");
+          const isSelected = selectedColor.hex.toUpperCase() === c.hex.toUpperCase();
+          const isPureWhite = c.hex.toUpperCase() === "#FFFFFF";
+          const isJetBlack = c.hex.toUpperCase() === "#111111";
+
           return (
             <button
               key={c.name}
               type="button"
               role="radio"
               aria-checked={isSelected}
-              aria-label={`Select ${c.name}`}
+              aria-label={`${c.name} (${c.hex})`}
+              title={`${c.name} (${c.hex})`}
               onClick={() => onSelectColor(c)}
-              className={`relative h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200 cursor-pointer focus-visible:outline-none ${
+              className={`group relative h-8 w-8 sm:h-9 sm:w-9 rounded-full transition-all duration-200 cursor-pointer focus-visible:outline-none ${
                 isSelected
-                  ? "ring-2 ring-[#F4D477] ring-offset-2 ring-offset-[#06080a] scale-110"
-                  : "hover:scale-105 border border-white/20 opacity-85 hover:opacity-100"
+                  ? "ring-2 ring-[#F4D477] ring-offset-2 ring-offset-[#06080a] scale-110 shadow-[0_0_14px_rgba(244,212,119,0.5)]"
+                  : "hover:scale-105 opacity-90 hover:opacity-100"
               }`}
               style={{
                 backgroundColor: c.bgHex,
+                border: isPureWhite
+                  ? "1px solid rgba(255, 255, 255, 0.7)"
+                  : isJetBlack
+                  ? "1px solid rgba(255, 255, 255, 0.25)"
+                  : "1px solid rgba(255, 255, 255, 0.15)",
                 boxShadow: isSelected
-                  ? "0 0 12px rgba(244, 212, 119, 0.45)"
-                  : "inset 0 1px 2px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.5)",
+                  ? undefined
+                  : "inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.6)",
               }}
             >
               {isSelected && (
                 <span
-                  className={`absolute inset-0 m-auto h-2 w-2 rounded-full ${
-                    isLight ? "bg-[#06080a]" : "bg-[#F4D477]"
+                  className={`absolute inset-0 m-auto h-2.5 w-2.5 rounded-full shadow-sm ${
+                    isPureWhite
+                      ? "bg-[#06080a]"
+                      : "bg-[#FFFFFF]"
                   }`}
                 />
               )}
@@ -481,7 +485,7 @@ export function Navbar() {
 
 /* ═══ CINEMATIC HERO + 01. CUSTOM T-SHIRT 3D CUSTOMISER ═══ */
 export function Hero() {
-  const [selectedTeeColor, setSelectedTeeColor] = useState<ColorOption>(TSHIRT_COLORS[0]!);
+  const [selectedTeeColor, setSelectedTeeColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
 
   return (
     <section
@@ -670,7 +674,7 @@ export function Hero() {
 
 /* ═══ 02. HOODIE — DEDICATED 3D PRODUCT CUSTOMISER SECTION ═══ */
 export function HoodieSection() {
-  const [selectedHoodieColor, setSelectedHoodieColor] = useState<ColorOption>(HOODIE_COLORS[0]!);
+  const [selectedHoodieColor, setSelectedHoodieColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
 
   return (
     <section
@@ -807,7 +811,7 @@ export function HoodieSection() {
 
 /* ═══ 03. FULL SLEEVE T-SHIRT — DEDICATED 3D PRODUCT CUSTOMISER SECTION ═══ */
 export function FullSleeveSection() {
-  const [selectedSleeveColor, setSelectedSleeveColor] = useState<ColorOption>(FULLSLEEVE_COLORS[0]!);
+  const [selectedSleeveColor, setSelectedSleeveColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
 
   return (
     <section

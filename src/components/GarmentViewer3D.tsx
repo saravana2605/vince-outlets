@@ -18,6 +18,56 @@ export interface GarmentViewer3DProps {
   fallbackImage?: string;
 }
 
+// High-fidelity material color calibrator for realistic garment rendering
+export function applyGarmentColor(
+  mat: THREE.MeshStandardMaterial,
+  hexColor: string,
+  isHoodie: boolean
+) {
+  const hex = hexColor.toUpperCase();
+
+  if (hex === "#FFFFFF") {
+    // Pure White — Clean, bright white while preserving fabric weave and realistic fold shading
+    if (isHoodie) {
+      // Compensate for raw fleece texture's warm undertone (R=196, G=188, B=173) to render crisp, bright white
+      mat.color.setRGB(1.28, 1.30, 1.45);
+    } else {
+      mat.color.setRGB(1.16, 1.16, 1.16);
+    }
+  } else if (hex === "#111111") {
+    // Jet Black — Deep rich black with clear visibility of stitches, seams and wrinkles
+    mat.color.setRGB(0.068, 0.068, 0.068);
+  } else if (hex === "#D71920") {
+    // Racing Red — Saturated, rich streetwear red
+    if (isHoodie) {
+      mat.color.setRGB(0.92, 0.09, 0.12);
+    } else {
+      mat.color.setRGB(0.88, 0.08, 0.11);
+    }
+  } else if (hex === "#123B73") {
+    // Royal Navy Blue — Deep royal navy with high saturation
+    if (isHoodie) {
+      mat.color.setRGB(0.08, 0.26, 0.62);
+    } else {
+      mat.color.setRGB(0.07, 0.24, 0.52);
+    }
+  } else if (hex === "#F47721") {
+    // Vibrant Orange — Bold, punchy streetwear orange
+    mat.color.setRGB(0.98, 0.45, 0.11);
+  } else if (hex === "#A7A9AC") {
+    // Heather Grey — Balanced neutral athletic grey
+    if (isHoodie) {
+      mat.color.setRGB(0.66, 0.68, 0.74);
+    } else {
+      mat.color.setRGB(0.66, 0.66, 0.68);
+    }
+  } else {
+    mat.color.setStyle(hexColor);
+  }
+
+  mat.needsUpdate = true;
+}
+
 export function GarmentViewer3D({
   modelPath,
   productName,
@@ -65,11 +115,10 @@ export function GarmentViewer3D({
   // Effect to update material color dynamically without re-mounting or reloading GLB
   useEffect(() => {
     if (targetMaterialRef.current) {
-      targetMaterialRef.current.color.setStyle(selectedColorHex);
-      targetMaterialRef.current.needsUpdate = true;
+      applyGarmentColor(targetMaterialRef.current, selectedColorHex, isHoodie);
       requestRenderRef.current();
     }
-  }, [selectedColorHex]);
+  }, [selectedColorHex, isHoodie]);
 
   // Main Three.js Scene Setup
   useEffect(() => {
@@ -88,7 +137,7 @@ export function GarmentViewer3D({
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = isHoodie ? 1.05 : 1.25;
+    renderer.toneMappingExposure = 1.22;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -104,8 +153,12 @@ export function GarmentViewer3D({
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40);
     camera.position.set(0, 0.05, 3.2);
 
-    // Studio Lighting
-    const keyLight = new THREE.DirectionalLight(0xfffaed, 2.7);
+    // Ambient light so deep crevices and black fabric folds remain readable
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
+
+    // Balanced High-CRI Studio Lighting
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
     keyLight.position.set(3.2, 4.2, 3.5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
@@ -113,13 +166,13 @@ export function GarmentViewer3D({
     keyLight.shadow.bias = -0.0004;
     scene.add(keyLight);
 
-    // Warm signature champagne-gold rim light
-    const goldRim = new THREE.DirectionalLight(0xf4d477, 3.2);
-    goldRim.position.set(-3.5, 2.5, -2.8);
-    scene.add(goldRim);
+    // Clean neutral rim light for crisp silhouette definition against dark background
+    const rimLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    rimLight.position.set(-3.5, 2.5, -2.8);
+    scene.add(rimLight);
 
     // Soft cool fill
-    const fillLight = new THREE.DirectionalLight(0xd9e5f2, 1.2);
+    const fillLight = new THREE.DirectionalLight(0xf0f4f8, 1.2);
     fillLight.position.set(0, -2.5, 2.5);
     scene.add(fillLight);
 
@@ -193,15 +246,15 @@ export function GarmentViewer3D({
                 if (clonedMat.emissive) {
                   clonedMat.emissive.setHex(0x000000);
                 }
-                clonedMat.roughness = 0.84;
-                clonedMat.metalness = 0.04;
+                clonedMat.roughness = 0.82;
+                clonedMat.metalness = 0.0;
               } else {
-                clonedMat.roughness = 0.88;
-                clonedMat.metalness = 0.04;
+                clonedMat.roughness = 0.86;
+                clonedMat.metalness = 0.0;
               }
 
-              // Apply the currently selected color tint immediately
-              clonedMat.color.setStyle(selectedColorHex);
+              // Apply the currently selected color tint immediately (Pure White by default)
+              applyGarmentColor(clonedMat, selectedColorHex, isHoodie);
               clonedMat.side = THREE.DoubleSide;
               clonedMat.needsUpdate = true;
             }
