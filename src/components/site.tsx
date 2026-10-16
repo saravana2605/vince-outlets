@@ -36,7 +36,6 @@ import murugaVelTee from "@/assets/products/muruga-vel-tee.webp";
 import neonSceneTee from "@/assets/products/neon-scene-tee.webp";
 import redDragonTee from "@/assets/products/red-dragon-tee.webp";
 import sureshRainaTee from "@/assets/products/suresh-raina-tee.webp";
-import festivalOffersPoster from "@/assets/products/festival-offers-poster.webp";
 import vintageMuruganTee from "@/assets/products/vintage-murugan-tee.webp";
 import hoodie from "@/assets/products/hoodie-optimized.webp";
 import sweatshirt from "@/assets/products/sweatshirt-optimized.webp";
@@ -54,11 +53,8 @@ import {
   GOOGLE_REVIEWS_URL,
   CLOUDMASA_URL,
   PHONE,
-  PHONE_ALT,
   WA_DISPLAY,
-  WA_DISPLAY_ALT,
   WA_NUMBER,
-  WA_NUMBER_ALT,
   ADDRESS,
   MAPS_URL,
   MAPS_EMBED,
@@ -74,7 +70,7 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "HOODIE - UNISEX": hoodie,
   "SWEATSHIRT - UNISEX": blackSweatshirt,
   "POLO - UNISEX": burgundyCartoonTee,
-  "CROPTOPS": neonSceneTee,
+  CROPTOPS: neonSceneTee,
   "KIDS - UNISEX": vintageMuruganTee,
 };
 
@@ -85,7 +81,7 @@ const PRODUCT_IMAGES_BACK: Record<string, string> = {
   "HOODIE - UNISEX": hoodie,
   "SWEATSHIRT - UNISEX": betterDaysSweatshirt,
   "POLO - UNISEX": dhoniTributeTee,
-  "CROPTOPS": redDragonTee,
+  CROPTOPS: redDragonTee,
   "KIDS - UNISEX": sureshRainaTee,
 };
 
@@ -168,9 +164,12 @@ export function BracketButton({
   rel?: string;
   type?: "button" | "submit" | "reset";
 }) {
-  const baseClass = variant === "gold" ? "btn-streetwear-primary" : "btn-streetwear-secondary";
+  const baseClass =
+    variant === "gold" ? "btn-streetwear-primary" : "btn-streetwear-secondary";
 
-  const content = <span className="inline-flex items-center gap-2">{children}</span>;
+  const content = (
+    <span className="inline-flex items-center gap-2">{children}</span>
+  );
 
   if (href) {
     return (
@@ -277,7 +276,8 @@ export function ColorSwatchPicker({
         aria-label={label}
       >
         {colors.map((c) => {
-          const isSelected = selectedColor.hex.toUpperCase() === c.hex.toUpperCase();
+          const isSelected =
+            selectedColor.hex.toUpperCase() === c.hex.toUpperCase();
           const isPureWhite = c.hex.toUpperCase() === "#FFFFFF";
           const isJetBlack = c.hex.toUpperCase() === "#111111";
 
@@ -300,8 +300,8 @@ export function ColorSwatchPicker({
                 border: isPureWhite
                   ? "1px solid rgba(255, 255, 255, 0.7)"
                   : isJetBlack
-                  ? "1px solid rgba(255, 255, 255, 0.25)"
-                  : "1px solid rgba(255, 255, 255, 0.15)",
+                    ? "1px solid rgba(255, 255, 255, 0.25)"
+                    : "1px solid rgba(255, 255, 255, 0.15)",
                 boxShadow: isSelected
                   ? undefined
                   : "inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.6)",
@@ -310,9 +310,7 @@ export function ColorSwatchPicker({
               {isSelected && (
                 <span
                   className={`absolute inset-0 m-auto h-2.5 w-2.5 rounded-full shadow-sm ${
-                    isPureWhite
-                      ? "bg-[#06080a]"
-                      : "bg-[#FFFFFF]"
+                    isPureWhite ? "bg-[#06080a]" : "bg-[#FFFFFF]"
                   }`}
                 />
               )}
@@ -348,7 +346,7 @@ export function Reveal({
           io.disconnect();
         }
       },
-      { threshold: 0.12 }
+      { threshold: 0.12 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -475,7 +473,11 @@ export function Navbar() {
           >
             <Phone size={15} />
           </a>
-          <WhatsAppButton text={MSG.general} variant="gold" className="!h-9 !py-1 !px-3 !text-xs">
+          <WhatsAppButton
+            text={MSG.general}
+            variant="gold"
+            className="!h-9 !py-1 !px-3 !text-xs"
+          >
             STUDIO CHAT <span className="arw font-mono">→</span>
           </WhatsAppButton>
         </div>
@@ -508,15 +510,27 @@ export function Navbar() {
               </a>
             ))}
             <div className="pt-4 flex flex-col gap-3">
-              <WhatsAppButton text={MSG.general} variant="gold" className="w-full justify-center">
+              <WhatsAppButton
+                text={MSG.general}
+                variant="gold"
+                className="w-full justify-center"
+              >
                 START WHATSAPP CHAT <span className="arw font-mono">→</span>
               </WhatsAppButton>
               <div className="flex items-center justify-around pt-2 text-xs font-mono text-[#a3a3a3]">
-                <a href="tel:+916369963871" className="hover:text-white flex items-center gap-1.5">
+                <a
+                  href="tel:+916369963871"
+                  className="hover:text-white flex items-center gap-1.5"
+                >
                   <Phone size={13} /> {PHONE}
                 </a>
                 <span>•</span>
-                <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1.5">
+                <a
+                  href={INSTAGRAM}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white flex items-center gap-1.5"
+                >
                   <Instagram size={13} /> INSTAGRAM
                 </a>
               </div>
@@ -530,7 +544,9 @@ export function Navbar() {
 
 /* ═══ CINEMATIC HERO + 01. CUSTOM T-SHIRT 3D CUSTOMISER ═══ */
 export function Hero() {
-  const [selectedTeeColor, setSelectedTeeColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
+  const [selectedTeeColor, setSelectedTeeColor] = useState<ColorOption>(
+    DEFAULT_GARMENT_COLOR,
+  );
 
   return (
     <section
@@ -560,7 +576,9 @@ export function Hero() {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#D4A62A] animate-pulse" />
             <span className="text-[#F4D477] uppercase font-bold">
-              <ScrambleText triggerOnArrival>PUDUCHERRY STUDIO // LAT: 11.934° N • 79.830° E</ScrambleText>
+              <ScrambleText triggerOnArrival>
+                PUDUCHERRY STUDIO // LAT: 11.934° N • 79.830° E
+              </ScrambleText>
             </span>
           </div>
           <div className="hidden md:flex items-center gap-6">
@@ -588,19 +606,27 @@ export function Hero() {
                 {/* Dim background resting letters */}
                 <span className="plate-rest block select-none">
                   <span className="block text-white">CUSTOM STREETWEAR.</span>
-                  <span className="block text-[#D4A62A]">YOUR DESIGN. YOUR IDENTITY.</span>
+                  <span className="block text-[#D4A62A]">
+                    YOUR DESIGN. YOUR IDENTITY.
+                  </span>
                 </span>
                 {/* Illuminated interactive cursor spotlight */}
-                <span className="plate-lit block select-none" aria-hidden="true">
+                <span
+                  className="plate-lit block select-none"
+                  aria-hidden="true"
+                >
                   <span className="block text-white">CUSTOM STREETWEAR.</span>
-                  <span className="block text-metal">YOUR DESIGN. YOUR IDENTITY.</span>
+                  <span className="block text-metal">
+                    YOUR DESIGN. YOUR IDENTITY.
+                  </span>
                 </span>
               </h1>
             </div>
 
             <p className="mt-5 max-w-xl text-base sm:text-lg text-[#D9D9D9] font-normal leading-relaxed">
-              Premium-quality apparel, customised with your own artwork, graphics or brand identity.
-              From 1-of-1 bespoke statement tees to full squad collections, tailored in our Puducherry workshop.
+              Premium-quality apparel, customised with your own artwork,
+              graphics or brand identity. From 1-of-1 bespoke statement tees to
+              full squad collections, tailored in our Puducherry workshop.
             </p>
 
             {/* Redesigned Streetwear Action Buttons */}
@@ -628,7 +654,9 @@ export function Hero() {
               <div className="flex items-start justify-between gap-4 mb-3 pb-3 border-b border-white/10">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-[10px] text-[#D4A62A] font-bold">[01 / T-SHIRT]</span>
+                    <span className="font-mono text-[10px] text-[#D4A62A] font-bold">
+                      [01 / T-SHIRT]
+                    </span>
                     <span className="font-mono text-[9px] tracking-widest text-[#a3a3a3] uppercase">
                       240+ GSM HEAVYWEIGHT
                     </span>
@@ -642,7 +670,9 @@ export function Hero() {
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">STARTING AT</span>
+                  <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">
+                    STARTING AT
+                  </span>
                   <span className="font-mono text-base sm:text-lg font-bold text-[#F4D477]">
                     {inr(499)}
                   </span>
@@ -659,7 +689,6 @@ export function Hero() {
                   defaultRotY={(8 * Math.PI) / 180}
                   defaultRotX={(2 * Math.PI) / 180}
                   isHoodie={false}
-                  fallbackImage={racingCollageTee}
                   className="h-full w-full"
                 />
               </div>
@@ -682,7 +711,8 @@ export function Hero() {
                   variant="gold"
                   className="w-full sm:w-auto justify-center !text-xs sm:!text-sm"
                 >
-                  CUSTOMISE THIS T-SHIRT <span className="arw font-mono">→</span>
+                  CUSTOMISE THIS T-SHIRT{" "}
+                  <span className="arw font-mono">→</span>
                 </WhatsAppButton>
               </div>
             </div>
@@ -695,11 +725,26 @@ export function Hero() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border-y border-white/10">
           {[
             ["01", "100% COMBED COTTON", "240+ to 430 GSM heavy-knit blanks"],
-            ["02", "HIGH-DENSITY INKS", "Zero wash-crack screen & DTF technology"],
-            ["03", "NO MINIMUMS (0 MOQ)", "1-of-1 bespoke pieces or squad runs"],
-            ["04", "PUDUCHERRY ROOTS", "Local craft studio with pan-India delivery"],
+            [
+              "02",
+              "HIGH-DENSITY INKS",
+              "Zero wash-crack screen & DTF technology",
+            ],
+            [
+              "03",
+              "NO MINIMUMS (0 MOQ)",
+              "1-of-1 bespoke pieces or squad runs",
+            ],
+            [
+              "04",
+              "PUDUCHERRY ROOTS",
+              "Local craft studio with pan-India delivery",
+            ],
           ].map(([num, title, desc]) => (
-            <div key={num} className="bg-[#06080a] p-4 sm:p-5 transition-colors hover:bg-[#0c1014]">
+            <div
+              key={num}
+              className="bg-[#06080a] p-4 sm:p-5 transition-colors hover:bg-[#0c1014]"
+            >
               <span className="font-mono text-[10px] text-[#D4A62A] font-bold block mb-1">
                 [{num}]
               </span>
@@ -719,7 +764,9 @@ export function Hero() {
 
 /* ═══ 02. HOODIE — DEDICATED 3D PRODUCT CUSTOMISER SECTION ═══ */
 export function HoodieSection() {
-  const [selectedHoodieColor, setSelectedHoodieColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
+  const [selectedHoodieColor, setSelectedHoodieColor] = useState<ColorOption>(
+    DEFAULT_GARMENT_COLOR,
+  );
 
   return (
     <section
@@ -737,7 +784,9 @@ export function HoodieSection() {
             <div className="flex items-start justify-between gap-4 mb-3 pb-3 border-b border-white/10">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-[10px] text-[#D4A62A] font-bold">[02 / HOODIE]</span>
+                  <span className="font-mono text-[10px] text-[#D4A62A] font-bold">
+                    [02 / HOODIE]
+                  </span>
                   <span className="font-mono text-[9px] tracking-widest text-[#a3a3a3] uppercase">
                     430 GSM FRENCH TERRY
                   </span>
@@ -746,12 +795,15 @@ export function HoodieSection() {
                   CUSTOM HOODIE
                 </h3>
                 <p className="text-xs text-[#a3a3a3] mt-0.5">
-                  Heavyweight French terry with your custom embroidery or high-density prints.
+                  Heavyweight French terry with your custom embroidery or
+                  high-density prints.
                 </p>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">STARTING AT</span>
+                <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">
+                  STARTING AT
+                </span>
                 <span className="font-mono text-base sm:text-lg font-bold text-[#F4D477]">
                   {inr(899)}
                 </span>
@@ -816,10 +868,22 @@ export function HoodieSection() {
           {/* Highlights grid */}
           <div className="mt-8 grid grid-cols-2 gap-3">
             {[
-              ["430 GSM TERRY", "Heavyweight knitted combed cotton for structure"],
-              ["DOUBLE HOOD", "Dual-ply hood construction with tonal drawstrings"],
-              ["CRACK-PROOF", "High-density screen and puff print compatibility"],
-              ["SQUAD RUNS", "1-of-1 samples to 500+ unit squad merch with zero MOQ"],
+              [
+                "430 GSM TERRY",
+                "Heavyweight knitted combed cotton for structure",
+              ],
+              [
+                "DOUBLE HOOD",
+                "Dual-ply hood construction with tonal drawstrings",
+              ],
+              [
+                "CRACK-PROOF",
+                "High-density screen and puff print compatibility",
+              ],
+              [
+                "SQUAD RUNS",
+                "1-of-1 samples to 500+ unit squad merch with zero MOQ",
+              ],
             ].map(([title, desc]) => (
               <div
                 key={title}
@@ -856,7 +920,9 @@ export function HoodieSection() {
 
 /* ═══ 03. FULL SLEEVE T-SHIRT — DEDICATED 3D PRODUCT CUSTOMISER SECTION ═══ */
 export function FullSleeveSection() {
-  const [selectedSleeveColor, setSelectedSleeveColor] = useState<ColorOption>(DEFAULT_GARMENT_COLOR);
+  const [selectedSleeveColor, setSelectedSleeveColor] = useState<ColorOption>(
+    DEFAULT_GARMENT_COLOR,
+  );
 
   return (
     <section
@@ -885,10 +951,22 @@ export function FullSleeveSection() {
           {/* Highlights grid */}
           <div className="mt-8 grid grid-cols-2 gap-3">
             {[
-              ["240+ GSM COMBED", "Heavy bio-washed jersey with smooth surface finish"],
-              ["RIBBED CUFFS", "Structured elasticated wrists that maintain shape"],
-              ["FULL-ARM PRINTS", "Screen-printed sleeve typography & sleeve crests"],
-              ["ZERO MINIMUMS", "Single custom print or bulk squad order dispatched quickly"],
+              [
+                "240+ GSM COMBED",
+                "Heavy bio-washed jersey with smooth surface finish",
+              ],
+              [
+                "RIBBED CUFFS",
+                "Structured elasticated wrists that maintain shape",
+              ],
+              [
+                "FULL-ARM PRINTS",
+                "Screen-printed sleeve typography & sleeve crests",
+              ],
+              [
+                "ZERO MINIMUMS",
+                "Single custom print or bulk squad order dispatched quickly",
+              ],
             ].map(([title, desc]) => (
               <div
                 key={title}
@@ -926,7 +1004,9 @@ export function FullSleeveSection() {
             <div className="flex items-start justify-between gap-4 mb-3 pb-3 border-b border-white/10">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-[10px] text-[#D4A62A] font-bold">[03 / FULL SLEEVE]</span>
+                  <span className="font-mono text-[10px] text-[#D4A62A] font-bold">
+                    [03 / FULL SLEEVE]
+                  </span>
                   <span className="font-mono text-[9px] tracking-widest text-[#a3a3a3] uppercase">
                     240+ GSM COMBED COTTON
                   </span>
@@ -935,12 +1015,15 @@ export function FullSleeveSection() {
                   CUSTOM FULL SLEEVE
                 </h3>
                 <p className="text-xs text-[#a3a3a3] mt-0.5">
-                  Personalise the garment with sleeve hits, chest art and collar prints.
+                  Personalise the garment with sleeve hits, chest art and collar
+                  prints.
                 </p>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">STARTING AT</span>
+                <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">
+                  STARTING AT
+                </span>
                 <span className="font-mono text-base sm:text-lg font-bold text-[#F4D477]">
                   {inr(799)}
                 </span>
@@ -1028,7 +1111,10 @@ export function CustomEnquiry() {
   ];
 
   return (
-    <section id="customise" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="customise"
+      className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       <span id="custom" className="sr-only" />
       {/* Subtle champagne-gold top rim glow */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4A62A]/35 to-transparent pointer-events-none" />
@@ -1153,8 +1239,14 @@ export function ProductCard({ p, i }: { p: Product; i: number }) {
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    const nx = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1));
-    const ny = Math.max(-1, Math.min(1, ((e.clientY - rect.top) / rect.height) * 2 - 1));
+    const nx = Math.max(
+      -1,
+      Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1),
+    );
+    const ny = Math.max(
+      -1,
+      Math.min(1, ((e.clientY - rect.top) / rect.height) * 2 - 1),
+    );
     setTilt({ rx: -ny * 7, ry: nx * 7 });
   };
 
@@ -1181,7 +1273,9 @@ export function ProductCard({ p, i }: { p: Product; i: number }) {
       >
         {/* Top Product Header */}
         <div className="flex items-center justify-between font-mono text-[10px] text-[#a3a3a3] mb-3">
-          <span className="text-[#D4A62A] font-bold">[{String(i + 1).padStart(2, "0")}]</span>
+          <span className="text-[#D4A62A] font-bold">
+            [{String(i + 1).padStart(2, "0")}]
+          </span>
           <span className="tracking-widest uppercase">{p.category}</span>
         </div>
 
@@ -1253,7 +1347,10 @@ export function ProductCard({ p, i }: { p: Product; i: number }) {
 
 /* ═══ SHOP / CATALOG SECTION ═══ */
 export function Shop() {
-  const cats = ["ALL", ...Array.from(new Set(PRODUCTS.map((p) => p.category.toUpperCase())))];
+  const cats = [
+    "ALL",
+    ...Array.from(new Set(PRODUCTS.map((p) => p.category.toUpperCase()))),
+  ];
   const [selectedCat, setSelectedCat] = useState("ALL");
 
   const list =
@@ -1262,7 +1359,10 @@ export function Shop() {
       : PRODUCTS.filter((p) => p.category.toUpperCase() === selectedCat);
 
   return (
-    <section id="collection" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="collection"
+      className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       <span id="shop" className="sr-only" />
       {/* Subtle champagne-gold top rim glow */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4A62A]/35 to-transparent pointer-events-none" />
@@ -1320,11 +1420,16 @@ export function Shop() {
               YOUR DESIGN.
             </h3>
             <p className="mt-2 text-xs text-[#A3A3A3] leading-relaxed">
-              Have a specific silhouette or artwork concept in mind? Send your graphic and talk directly to our print specialists.
+              Have a specific silhouette or artwork concept in mind? Send your
+              graphic and talk directly to our print specialists.
             </p>
           </div>
 
-          <WhatsAppButton text={MSG.custom} variant="gold" className="!w-full !justify-center !text-xs !py-2">
+          <WhatsAppButton
+            text={MSG.custom}
+            variant="gold"
+            className="!w-full !justify-center !text-xs !py-2"
+          >
             START CUSTOM PIECE <span className="arw font-mono">→</span>
           </WhatsAppButton>
         </Reveal>
@@ -1365,7 +1470,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: racingCollageTee,
     aspectRatio: "aspect-[4/5]",
     price: 499,
-    description: "Dynamic cinematic motorsport graphic celebrating Tamil cinema camaraderie, speed helmets and racing typography on pitch-black blank.",
+    description:
+      "Dynamic cinematic motorsport graphic celebrating Tamil cinema camaraderie, speed helmets and racing typography on pitch-black blank.",
     tags: ["240 GSM", "OVERSIZED", "HIGH-DENSITY DTF"],
   },
   {
@@ -1381,7 +1487,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: thalapathyPosterTee,
     aspectRatio: "aspect-[4/5]",
     price: 499,
-    description: "High-impact red textured poster backdrop featuring Thalapathy Vijay portrait with industrial barcode markers and rally typography.",
+    description:
+      "High-impact red textured poster backdrop featuring Thalapathy Vijay portrait with industrial barcode markers and rally typography.",
     tags: ["240 GSM", "OVERSIZED", "DTF PRINT"],
   },
   {
@@ -1397,7 +1504,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: ajithThalaTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Crisp white streetwear blank printed with gritty monochrome and red duotone Ajith Kumar portrait and bold 'NO RULES. ONLY THALA' lettering.",
+    description:
+      "Crisp white streetwear blank printed with gritty monochrome and red duotone Ajith Kumar portrait and bold 'NO RULES. ONLY THALA' lettering.",
     tags: ["200 GSM", "REGULAR FIT", "SCREEN PRINT"],
   },
   {
@@ -1413,7 +1521,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: murugaVelTee,
     aspectRatio: "aspect-[4/5]",
     price: 499,
-    description: "Intricate sacred Muruga Vel spear surrounded by glowing fiery gold and orange micro-gradients. High-density crack-proof finish on deep black cotton.",
+    description:
+      "Intricate sacred Muruga Vel spear surrounded by glowing fiery gold and orange micro-gradients. High-density crack-proof finish on deep black cotton.",
     tags: ["240 GSM", "HEAVYWEIGHT", "GOLDEN DTF"],
   },
   {
@@ -1429,7 +1538,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: dhoniTributeTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Fiery racing red streetwear blank showcasing MS Dhoni in golden CSK duotone graphics with iconic 'Whistle Podu' typography.",
+    description:
+      "Fiery racing red streetwear blank showcasing MS Dhoni in golden CSK duotone graphics with iconic 'Whistle Podu' typography.",
     tags: ["200 GSM", "CSK TRIBUTE", "DUOTONE DTF"],
   },
   {
@@ -1445,7 +1555,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: strFilmCollageTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Vintage cinema film frames, newspaper typographic clippings, and monochrome Silambarasan TR portrait on pure white heavyweight blank.",
+    description:
+      "Vintage cinema film frames, newspaper typographic clippings, and monochrome Silambarasan TR portrait on pure white heavyweight blank.",
     tags: ["200 GSM", "PURE WHITE", "HALFTONE PRINT"],
   },
   {
@@ -1461,7 +1572,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: neonSceneTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Futuristic neon city nightscape rendered in luminous cyan, magenta, and deep violet pigments on jet black cotton.",
+    description:
+      "Futuristic neon city nightscape rendered in luminous cyan, magenta, and deep violet pigments on jet black cotton.",
     tags: ["220 GSM", "NEON DTF", "SYNTHWAVE"],
   },
   {
@@ -1477,7 +1589,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: redDragonTee,
     aspectRatio: "aspect-[4/5]",
     price: 499,
-    description: "Intense crimson dragon artwork intertwined with bold hip-hop calligraphy, engineered for oversized street drape and durability.",
+    description:
+      "Intense crimson dragon artwork intertwined with bold hip-hop calligraphy, engineered for oversized street drape and durability.",
     tags: ["240 GSM", "DRAGON ART", "PLASTISOL SCREEN"],
   },
   {
@@ -1493,7 +1606,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: sureshRainaTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Tribute to Suresh Raina's immortal legacy in yellow, number 3 emblem, and bold sports typographic framing on soft heather grey cotton.",
+    description:
+      "Tribute to Suresh Raina's immortal legacy in yellow, number 3 emblem, and bold sports typographic framing on soft heather grey cotton.",
     tags: ["200 GSM", "HEATHER GREY", "ATHLETIC PRINT"],
   },
   {
@@ -1509,7 +1623,8 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: vintageMuruganTee,
     aspectRatio: "aspect-[4/5]",
     price: 399,
-    description: "Temple architecture etching and classic Murugan divinity rendered in warm antique sepia tones on heavy vintage cream cotton.",
+    description:
+      "Temple architecture etching and classic Murugan divinity rendered in warm antique sepia tones on heavy vintage cream cotton.",
     tags: ["240 GSM", "SEPIA WASH", "HERITAGE SCREEN"],
   },
   {
@@ -1525,30 +1640,17 @@ export const ARCHIVE_ITEMS: ArchiveItem[] = [
     image: burgundyCartoonTee,
     aspectRatio: "aspect-[4/5]",
     price: 499,
-    description: "Vibrant comic art and iconic Tamil humor typography on premium burgundy blank. Features smooth hand-feel and fade-proof colorfast inks.",
+    description:
+      "Vibrant comic art and iconic Tamil humor typography on premium burgundy blank. Features smooth hand-feel and fade-proof colorfast inks.",
     tags: ["200 GSM", "BURGUNDY", "COMIC SILKSCREEN"],
-  },
-  {
-    id: "festival-offers",
-    title: "VIJAYADASHAMI FESTIVAL DROPS POSTER",
-    subtitle: "Exclusive Studio Deals, Tiered Bulk Pricing & 0 MOQ",
-    category: "promo",
-    categoryLabel: "STUDIO SPECIALS",
-    badge: "UP TO 40% OFF",
-    fabric: "All Blanks (Tees, Hoodies, Sweatshirts)",
-    printMethod: "Screen, DTF, Puff & Embroidery",
-    gsm: "200-430 GSM",
-    image: festivalOffersPoster,
-    aspectRatio: "aspect-[4/5]",
-    price: 399,
-    description: "Limited festival promotion poster from our Puducherry workshop offering up to 40% discount on single custom pieces and squad bulk orders.",
-    tags: ["PROMO", "0 MOQ", "UP TO 40% OFF"],
   },
 ];
 
 export function PrintArchive() {
   const [selectedCat, setSelectedCat] = useState<string>("all");
-  const [activeModalItem, setActiveModalItem] = useState<ArchiveItem | null>(null);
+  const [activeModalItem, setActiveModalItem] = useState<ArchiveItem | null>(
+    null,
+  );
 
   // Modal body scroll lock and escape listener
   useEffect(() => {
@@ -1573,7 +1675,6 @@ export function PrintArchive() {
     { key: "sports", label: "SPORTS & ATHLETIC" },
     { key: "spiritual", label: "SPIRITUAL & HERITAGE" },
     { key: "streetwear", label: "STREETWEAR GRAPHICS" },
-    { key: "promo", label: "STUDIO SPECIALS" },
   ];
 
   const filteredItems =
@@ -1582,7 +1683,10 @@ export function PrintArchive() {
       : ARCHIVE_ITEMS.filter((item) => item.category === selectedCat);
 
   return (
-    <section id="archive" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="archive"
+      className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4A62A]/35 to-transparent pointer-events-none" />
 
       <SectionHeading
@@ -1626,7 +1730,8 @@ export function PrintArchive() {
             {/* Top Bar: Numbering + Category */}
             <div className="flex items-center justify-between font-mono text-[10px] text-[#a3a3a3] mb-3">
               <span className="text-[#D4A62A] font-bold">
-                [{String(idx + 1).padStart(2, "0")}/{String(filteredItems.length).padStart(2, "0")}]
+                [{String(idx + 1).padStart(2, "0")}/
+                {String(filteredItems.length).padStart(2, "0")}]
               </span>
               <span className="tracking-widest uppercase text-[#a3a3a3] truncate max-w-[150px]">
                 {item.categoryLabel}
@@ -1694,7 +1799,9 @@ export function PrintArchive() {
             {/* Fabric & Tech Print Info */}
             <div className="mt-3 flex items-center justify-between font-mono text-[10px] text-[#8e8e8e] border-t border-white/5 pt-2.5">
               <span>{item.gsm}</span>
-              <span className="text-[#D4A62A] truncate max-w-[130px]">{item.printMethod}</span>
+              <span className="text-[#D4A62A] truncate max-w-[130px]">
+                {item.printMethod}
+              </span>
             </div>
 
             {/* Price & Direct WhatsApp CTA */}
@@ -1718,7 +1825,7 @@ export function PrintArchive() {
 
             <BracketButton
               href={waLink(
-                `Hi Vince Outlets, I want to order the "${item.title}" (${item.subtitle}) starting at ${inr(item.price)}. Please share size availability and delivery timeline.`
+                `Hi Vince Outlets, I want to order the "${item.title}" (${item.subtitle}) starting at ${inr(item.price)}. Please share size availability and delivery timeline.`,
               )}
               target="_blank"
               rel="noopener noreferrer"
@@ -1795,26 +1902,36 @@ export function PrintArchive() {
                 <div className="mt-6 space-y-2 border-y border-white/10 py-4 font-mono text-xs">
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-[#a3a3a3]">FABRIC BLANK:</span>
-                    <span className="text-white font-bold">{activeModalItem.fabric}</span>
+                    <span className="text-white font-bold">
+                      {activeModalItem.fabric}
+                    </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-[#a3a3a3]">PRINT TECHNIQUE:</span>
-                    <span className="text-[#F4D477] font-bold">{activeModalItem.printMethod}</span>
+                    <span className="text-[#F4D477] font-bold">
+                      {activeModalItem.printMethod}
+                    </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-[#a3a3a3]">DURABILITY RATING:</span>
-                    <span className="text-white font-bold">50+ Washes (Crack-Proof)</span>
+                    <span className="text-white font-bold">
+                      50+ Washes (Crack-Proof)
+                    </span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-[#a3a3a3]">AVAILABLE SIZES:</span>
-                    <span className="text-white font-bold">S, M, L, XL, 2XL, 3XL, 4XL, 5XL</span>
+                    <span className="text-white font-bold">
+                      S, M, L, XL, 2XL, 3XL, 4XL, 5XL
+                    </span>
                   </div>
                 </div>
 
                 {/* Pricing & Order CTA */}
                 <div className="mt-6 flex items-baseline justify-between">
                   <div>
-                    <span className="font-mono text-[10px] text-[#a3a3a3] block">STARTING PRICE</span>
+                    <span className="font-mono text-[10px] text-[#a3a3a3] block">
+                      STARTING PRICE
+                    </span>
                     <span className="font-mono text-2xl font-bold text-[#F4D477]">
                       {inr(activeModalItem.price)}
                     </span>
@@ -1830,7 +1947,8 @@ export function PrintArchive() {
                     variant="gold"
                     className="!w-full !justify-center !text-sm"
                   >
-                    ORDER THIS PIECE VIA WHATSAPP <span className="arw font-mono">→</span>
+                    ORDER THIS PIECE VIA WHATSAPP{" "}
+                    <span className="arw font-mono">→</span>
                   </WhatsAppButton>
                 </div>
               </div>
@@ -1869,7 +1987,10 @@ export function Why() {
   ];
 
   return (
-    <section id="why" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="why"
+      className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       {/* Subtle champagne-gold top rim glow */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4A62A]/35 to-transparent pointer-events-none" />
 
@@ -1932,7 +2053,10 @@ export function Bulk() {
   ];
 
   return (
-    <section id="bulk" className="relative overflow-hidden bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="bulk"
+      className="relative overflow-hidden bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       <div className="absolute inset-0 bg-gradient-to-r from-[#04070a] via-[#04070a]/94 to-[#04070a]/85" />
 
       <div className="relative mx-auto max-w-[1500px] px-5 py-20 lg:px-10 lg:py-28">
@@ -1951,33 +2075,22 @@ export function Bulk() {
           sub="Planning a college fest drop, sports jersey order, company apparel, or friends trip? Vince Outlets handles bulk custom orders with tiered volume pricing and guaranteed studio quality."
         />
 
-        {/* Studio Special Offers Spotlight Banner with real Festival Poster */}
-        <div className="mt-12 panel relative overflow-hidden rounded-sm border border-[#D4A62A]/40 bg-[#06080a] p-6 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+        {/* Permanent Bulk Custom Apparel Studio Showcase */}
+        <div className="mt-12 panel relative overflow-hidden rounded-sm border border-white/10 bg-[#06080a] p-6 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
           <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-4 relative aspect-square overflow-hidden rounded-sm border border-white/10 bg-[#04070a]">
-              <img
-                src={festivalOffersPoster}
-                alt="Vince Outlets Vijayadashami Special Festival Offers Poster"
-                loading="lazy"
-                width={1254}
-                height={1254}
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-              <span className="absolute top-3 left-3 bg-[#D4A62A] text-[#04070a] px-2.5 py-1 font-mono text-[9px] font-bold tracking-wider rounded-sm shadow-md">
-                STUDIO SPECIAL DROP
-              </span>
-            </div>
-
             <div className="lg:col-span-8">
               <div className="inline-flex items-center gap-2 rounded-sm border border-[#D4A62A]/30 bg-[#0e1418] px-3 py-1 font-mono text-[10px] text-[#F4D477] uppercase mb-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A62A] animate-pulse" />
-                LIMITED PROMOTION // ALL-INDIA DISPATCH
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A62A]" />
+                CUSTOM SQUAD & CORPORATE APPAREL
               </div>
               <h3 className="display text-2xl sm:text-3xl lg:text-4xl text-white font-bold tracking-tight">
-                VIJAYADASHAMI SPECIAL: <span className="text-[#F4D477]">UP TO 40% OFF</span>
+                TIERED VOLUME PRICING.{" "}
+                <span className="text-metal">GUARANTEED CRAFT.</span>
               </h3>
               <p className="mt-3 text-sm text-[#D9D9D9] leading-relaxed max-w-2xl">
-                Upgrade your squad or brand merchandise with our festival pricing. Whether you are printing 10 tees or 500 hoodies, get direct factory rates with premium 240+ GSM heavyweight fabrics and zero compromise on print quality.
+                Collaborate directly with our Puducherry workshop for your batch
+                apparel drops. Tailored on 240+ to 430 GSM heavyweight cotton
+                and French terry blanks with zero cracking over repeat wear.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
@@ -1992,17 +2105,38 @@ export function Bulk() {
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                <WhatsAppButton
-                  text="Hi Vince Outlets, I'm interested in the Vijayadashami festival bulk offer. Please share tiered pricing and turnaround times for my order."
-                  variant="gold"
-                >
-                  CLAIM FESTIVAL BULK QUOTE <span className="arw font-mono">→</span>
+                <WhatsAppButton text={MSG.bulk} variant="gold">
+                  ENQUIRE BULK APPAREL <span className="arw font-mono">→</span>
                 </WhatsAppButton>
                 <span className="font-mono text-xs text-[#a3a3a3] flex items-center gap-2">
                   <CheckCircle2 size={14} className="text-[#D4A62A]" />
                   Zero Minimum Order Requirement (0 MOQ)
                 </span>
               </div>
+            </div>
+
+            <div className="lg:col-span-4 grid grid-cols-2 gap-3">
+              {[
+                ["0 MOQ", "Single prototype or full squad drops"],
+                [
+                  "240-430 GSM",
+                  "Heavyweight blanks in oversized & regular fits",
+                ],
+                ["PRINT CRAFT", "High-density screen, DTF & embroidery"],
+                ["PAN-INDIA", "Direct dispatch from Puducherry studio"],
+              ].map(([t, d]) => (
+                <div
+                  key={t}
+                  className="p-3.5 rounded-sm border border-white/10 bg-[#04070a]"
+                >
+                  <p className="font-mono text-xs font-bold text-[#F4D477] mb-1">
+                    {t}
+                  </p>
+                  <p className="font-mono text-[10px] text-[#a3a3a3] leading-relaxed">
+                    {d}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -2017,7 +2151,10 @@ export const Social = () => null;
 /* ═══ SECTION 6: CONTACT & STUDIO LOCATION ═══ */
 export function ContactSection() {
   return (
-    <section id="contact" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+    <section
+      id="contact"
+      className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20"
+    >
       <SectionHeading
         index="05"
         eyebrow="CONTACT & PUDUCHERRY STUDIO"
@@ -2089,15 +2226,7 @@ export function ContactSection() {
                     rel="noopener noreferrer"
                     className="text-white hover:text-[#F4D477] transition-colors"
                   >
-                    {WA_DISPLAY} <span className="text-[10px] text-[#25D366]">(PRIMARY)</span>
-                  </a>
-                  <a
-                    href={waLink(MSG.general, WA_NUMBER_ALT)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#a3a3a3] hover:text-white transition-colors text-xs"
-                  >
-                    {WA_DISPLAY_ALT} <span className="text-[10px] text-[#a3a3a3]">(ALT / DIRECT)</span>
+                    {WA_DISPLAY}
                   </a>
                 </div>
               </div>
@@ -2137,7 +2266,11 @@ export function ContactSection() {
             </div>
           </div>
 
-          <WhatsAppButton text={MSG.general} variant="gold" className="w-full justify-center mt-4">
+          <WhatsAppButton
+            text={MSG.general}
+            variant="gold"
+            className="w-full justify-center mt-4"
+          >
             MESSAGE US ON WHATSAPP <span className="arw font-mono">→</span>
           </WhatsAppButton>
         </Reveal>
@@ -2176,14 +2309,17 @@ export function Footer() {
                 className="h-12 w-12 rounded-full object-contain ring-1 ring-[#D4A62A]/40"
               />
               <div>
-                <span className="display text-xl text-white">VINCE OUTLETS</span>
+                <span className="display text-xl text-white">
+                  VINCE OUTLETS
+                </span>
                 <span className="font-mono text-[9px] tracking-[0.25em] text-[#D4A62A] block uppercase font-medium">
                   Puducherry Studio
                 </span>
               </div>
             </div>
             <p className="mt-4 font-mono text-xs text-[#a3a3a3] leading-relaxed">
-              Custom streetwear engineered around your vibe. High-density screen and DTF printing for bespoke personal statements and squad drops.
+              Custom streetwear engineered around your vibe. High-density screen
+              and DTF printing for bespoke personal statements and squad drops.
             </p>
           </div>
 
@@ -2218,17 +2354,6 @@ export function Footer() {
                 >
                   <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
                   WA: {WA_DISPLAY}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={waLink(MSG.general, WA_NUMBER_ALT)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors flex items-center gap-1.5"
-                >
-                  <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-                  ALT WA: {WA_DISPLAY_ALT}
                 </a>
               </li>
               <li>

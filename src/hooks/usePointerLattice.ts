@@ -4,8 +4,12 @@ export function usePointerLattice() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
 
-    const isCoarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isCoarse = window.matchMedia(
+      "(hover: none) and (pointer: coarse)",
+    ).matches;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     if (reducedMotion || isCoarse) {
       // On mobile / coarse or reduced motion, avoid running rAF loops entirely
@@ -75,7 +79,9 @@ export function usePointerLattice() {
       }
     };
 
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);

@@ -20,17 +20,55 @@ import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import heroImage from "@/assets/hero.jpg";
 
 const TITLE = "Vince Outlets | Custom T-Shirts & Streetwear in Puducherry";
-const DESC = "Vince Outlets offers custom printed T-shirts, hoodies, oversized tees and ready-to-wear streetwear in Puducherry. Order custom single pieces, squad merchandise and bulk clothing through WhatsApp.";
+const DESC =
+  "Vince Outlets offers custom printed T-shirts, hoodies, oversized tees and ready-to-wear streetwear in Puducherry. Order custom single pieces, squad merchandise and bulk clothing through WhatsApp.";
 
 const ld = [
   {
-    "@context": "https://schema.org", "@type": "ClothingStore", name: "Vince Outlets", description: DESC,
-    telephone: "+916369963871", sameAs: [INSTAGRAM],
-    address: { "@type": "PostalAddress", streetAddress: "53 Iyyanar Koil Street, Lenin St, Kuyavarpalayam", addressLocality: "Puducherry", postalCode: "605013", addressCountry: "IN" },
-    openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], opens: "09:00", closes: "23:30" }],
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    name: "Vince Outlets",
+    description: DESC,
+    telephone: "+916369963871",
+    sameAs: [INSTAGRAM],
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "53 Iyyanar Koil Street, Lenin St, Kuyavarpalayam",
+      addressLocality: "Puducherry",
+      postalCode: "605013",
+      addressCountry: "IN",
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "09:00",
+        closes: "23:30",
+      },
+    ],
   },
-  { "@context": "https://schema.org", "@type": "Organization", name: "Vince Outlets", sameAs: [INSTAGRAM] },
-  ...PRODUCTS.map((p) => ({ "@context": "https://schema.org", "@type": "Product", name: p.name, description: p.desc, brand: { "@type": "Brand", name: "Vince Outlets" }, offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" } })),
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Vince Outlets",
+    sameAs: [INSTAGRAM],
+  },
+  ...PRODUCTS.map((p) => ({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: p.name,
+    description: p.desc,
+    brand: { "@type": "Brand", name: "Vince Outlets" },
+    offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" },
+  })),
 ];
 
 export const Route = createFileRoute("/")({

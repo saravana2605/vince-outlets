@@ -1,9 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback, Component, type ReactNode } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  Component,
+  type ReactNode,
+} from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import heroFallback from "@/assets/products/racing-collage-tee.webp";
-
 export interface GarmentViewer3DProps {
   modelPath: string;
   productName: string;
@@ -17,19 +22,14 @@ export interface GarmentViewer3DProps {
   fallbackImage?: string | undefined;
 }
 
-// Check WebGL availability safely and release test context immediately to avoid GPU memory leaks
+// Check WebGL availability safely without leaking dummy contexts
 function isWebGLAvailable(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    const canvas = document.createElement("canvas");
-    const gl =
-      canvas.getContext("webgl2") ||
-      canvas.getContext("webgl") ||
-      canvas.getContext("experimental-webgl");
-    if (!gl) return false;
-    const loseContext = (gl as any).getExtension?.("WEBGL_lose_context");
-    loseContext?.loseContext();
-    return true;
+    return Boolean(
+      window.WebGLRenderingContext ||
+      ("WebGL2RenderingContext" in window && window.WebGL2RenderingContext),
+    );
   } catch {
     return false;
   }
@@ -48,7 +48,10 @@ function getSharedDracoLoader(): DRACOLoader {
 // Module-level model cache to avoid re-fetching or re-decoding 1.5MB GLBs
 const modelCache = new Map<string, Promise<THREE.Group>>();
 
-function loadCachedModel(modelPath: string, requiresDraco: boolean): Promise<THREE.Group> {
+function loadCachedModel(
+  modelPath: string,
+  requiresDraco: boolean,
+): Promise<THREE.Group> {
   const existing = modelCache.get(modelPath);
   if (existing) return existing;
 
@@ -72,7 +75,7 @@ function loadCachedModel(modelPath: string, requiresDraco: boolean): Promise<THR
         console.warn(`Failed to load 3D model ${modelPath}:`, error);
         modelCache.delete(modelPath);
         reject(error);
-      }
+      },
     );
   });
 
@@ -84,16 +87,16 @@ function loadCachedModel(modelPath: string, requiresDraco: boolean): Promise<THR
 export function applyGarmentColor(
   mat: THREE.MeshStandardMaterial,
   hexColor: string,
-  isHoodie: boolean
+  isHoodie: boolean,
 ) {
   const hex = hexColor.toUpperCase();
 
   if (hex === "#FFFFFF") {
-    // Pure White — Crisp streetwear white while preserving photorealistic fabric fold shading
+    // Pure White — Crisp streetwear white preserving fabric texture, stitch details and realistic fold shadows
     if (isHoodie) {
       mat.color.setRGB(1.24, 1.26, 1.38);
     } else {
-      mat.color.setRGB(1.14, 1.14, 1.14);
+      mat.color.setRGB(1.0, 1.0, 1.0);
     }
   } else if (hex === "#111111") {
     // Jet Black — Deep rich charcoal-black with visible seams, stitching and wrinkle shadows
@@ -136,25 +139,48 @@ export function GarmentFallbackCard({
   className = "",
 }: {
   productName: string;
-  fallbackImage: string;
+  fallbackImage?: string | undefined;
   className?: string | undefined;
 }) {
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-[#0d1115] ${className}`}
+      className={`relative flex flex-col items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-[#06080a] p-6 text-center ${className}`}
     >
-      <img
-        src={fallbackImage}
-        alt={productName}
-        width={1024}
-        height={1024}
-        loading="lazy"
-        decoding="async"
-        className="h-full w-full object-cover object-center drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
-      />
-      <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-sm border border-white/10 bg-[#06080a]/90 px-3 py-1 font-mono text-[10px] tracking-wider text-[#f4d477] backdrop-blur-md">
+      {fallbackImage ? (
+        <img
+          src={fallbackImage}
+          alt={productName}
+          width={1024}
+          height={1024}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover object-center drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
+        />
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D4A62A]/40 bg-[#0e1418] text-[#F4D477]">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+            </svg>
+          </div>
+          <p className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+            {productName}
+          </p>
+          <span className="font-mono text-[10px] tracking-widest text-[#F4D477] uppercase bg-[#0e1418] border border-[#D4A62A]/30 px-2 py-0.5 rounded-sm">
+            3D PRODUCT PREVIEW
+          </span>
+        </div>
+      )}
+      <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-sm border border-white/10 bg-[#06080a]/90 px-2.5 py-1 font-mono text-[9px] tracking-wider text-[#f4d477] backdrop-blur-md">
         <span className="h-1.5 w-1.5 rounded-full bg-[#d4a62a]" />
-        {productName} • PREVIEW
+        {productName} • PUDUCHERRY STUDIO
       </div>
     </div>
   );
@@ -164,7 +190,7 @@ export function GarmentFallbackCard({
 interface ErrorBoundaryProps {
   children: ReactNode;
   productName: string;
-  fallbackImage: string;
+  fallbackImage?: string | undefined;
   className?: string | undefined;
 }
 
@@ -172,7 +198,10 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-export class Viewer3DErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class Viewer3DErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -183,7 +212,10 @@ export class Viewer3DErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   override componentDidCatch(error: unknown) {
-    console.warn(`3D Viewport error caught for ${this.props.productName}:`, error);
+    console.warn(
+      `3D Viewport error caught for ${this.props.productName}:`,
+      error,
+    );
   }
 
   override render() {
@@ -211,7 +243,7 @@ function GarmentViewer3DInner({
   defaultRotX = (2 * Math.PI) / 180,
   isHoodie = false,
   className = "",
-  fallbackImage = heroFallback,
+  fallbackImage,
 }: GarmentViewer3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -264,7 +296,7 @@ function GarmentViewer3DInner({
           proximityObserver.disconnect();
         }
       },
-      { rootMargin: "350px 0px" }
+      { rootMargin: "350px 0px" },
     );
 
     proximityObserver.observe(container);
@@ -321,7 +353,10 @@ function GarmentViewer3DInner({
       renderer.toneMappingExposure = 1.18;
       renderer.shadowMap.enabled = false;
     } catch (err) {
-      console.warn(`Could not initialize WebGL renderer for ${productName}:`, err);
+      console.warn(
+        `Could not initialize WebGL renderer for ${productName}:`,
+        err,
+      );
       if (!isDisposed) {
         setLoadError(true);
         setLoading(false);
@@ -332,7 +367,9 @@ function GarmentViewer3DInner({
     // Context loss handler
     const onContextLost = (event: Event) => {
       event.preventDefault();
-      console.warn(`WebGL context lost for ${productName}. Switching to high-res preview.`);
+      console.warn(
+        `WebGL context lost for ${productName}. Switching to high-res preview.`,
+      );
       isContextLost = true;
       if (!isDisposed) {
         setLoadError(true);
@@ -408,7 +445,9 @@ function GarmentViewer3DInner({
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
             if (mesh.material) {
-              const origMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+              const origMat = Array.isArray(mesh.material)
+                ? mesh.material[0]
+                : mesh.material;
               const clonedMat = (origMat as THREE.MeshStandardMaterial).clone();
               mesh.material = clonedMat;
               newMaterials.push(clonedMat);
@@ -454,7 +493,8 @@ function GarmentViewer3DInner({
 
     // Resize math
     function handleResize() {
-      if (!container || !canvas || !renderer || isDisposed || isContextLost) return;
+      if (!container || !canvas || !renderer || isDisposed || isContextLost)
+        return;
       const rect = container.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
@@ -552,7 +592,7 @@ function GarmentViewer3DInner({
           }
         }
       },
-      { threshold: 0.02, rootMargin: "100px" }
+      { threshold: 0.02, rootMargin: "100px" },
     );
     observer.observe(container);
 
@@ -593,7 +633,9 @@ function GarmentViewer3DInner({
         loadedModel.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
-            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            const mats = Array.isArray(mesh.material)
+              ? mesh.material
+              : [mesh.material];
             mats.forEach((m) => {
               m?.dispose();
             });
@@ -604,72 +646,91 @@ function GarmentViewer3DInner({
       if (renderer) {
         try {
           renderer.dispose();
-          renderer.forceContextLoss();
         } catch {
           // ignore
         }
       }
     };
-  }, [isNearViewport, modelPath, requiresDraco, defaultScale, defaultRotY, defaultRotX, isHoodie, productName]);
+    // selectedColorHex changes are reactively applied to cloned materials in the dedicated effect above to avoid tearing down the WebGL scene
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isNearViewport,
+    modelPath,
+    requiresDraco,
+    defaultScale,
+    defaultRotY,
+    defaultRotX,
+    isHoodie,
+    productName,
+  ]);
 
   // Pointer interactions with mobile touch scroll preservation
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const p = pointerState.current;
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const p = pointerState.current;
 
-    if (p.isDragging) {
-      const dx = e.clientX - p.lastDragX;
-      const dy = e.clientY - p.lastDragY;
+      if (p.isDragging) {
+        const dx = e.clientX - p.lastDragX;
+        const dy = e.clientY - p.lastDragY;
+        p.lastDragX = e.clientX;
+        p.lastDragY = e.clientY;
+
+        p.userRotVelY = dx * 0.007;
+        p.userRotVelX = dy * 0.007;
+        p.userRotY += p.userRotVelY;
+        p.userRotX = Math.max(-0.6, Math.min(0.6, p.userRotX + p.userRotVelX));
+
+        if (Math.abs(p.userRotX) > 0.05 || Math.abs(p.userRotY) > 0.05) {
+          setHasInteracted(true);
+        }
+      } else {
+        const rect = container.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+        p.targetTiltY = nx * 0.14;
+        p.targetTiltX = -ny * 0.08;
+        p.isHovered = true;
+      }
+    },
+    [],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const p = pointerState.current;
+      p.isResetting = false;
+      p.isDragging = true;
+      p.dragStartX = e.clientX;
+      p.dragStartY = e.clientY;
       p.lastDragX = e.clientX;
       p.lastDragY = e.clientY;
+      p.userRotVelX = 0;
+      p.userRotVelY = 0;
 
-      p.userRotVelY = dx * 0.007;
-      p.userRotVelX = dy * 0.007;
-      p.userRotY += p.userRotVelY;
-      p.userRotX = Math.max(-0.6, Math.min(0.6, p.userRotX + p.userRotVelX));
-
-      if (Math.abs(p.userRotX) > 0.05 || Math.abs(p.userRotY) > 0.05) {
-        setHasInteracted(true);
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
       }
-    } else {
-      const rect = container.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-      p.targetTiltY = nx * 0.14;
-      p.targetTiltX = -ny * 0.08;
-      p.isHovered = true;
-    }
-  }, []);
+    },
+    [],
+  );
 
-  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const p = pointerState.current;
-    p.isResetting = false;
-    p.isDragging = true;
-    p.dragStartX = e.clientX;
-    p.dragStartY = e.clientY;
-    p.lastDragX = e.clientX;
-    p.lastDragY = e.clientY;
-    p.userRotVelX = 0;
-    p.userRotVelY = 0;
-
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    pointerState.current.isDragging = false;
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId);
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      pointerState.current.isDragging = false;
+      try {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handlePointerCancel = useCallback(() => {
     pointerState.current.isDragging = false;
@@ -751,7 +812,7 @@ export function GarmentViewer3D(props: GarmentViewer3DProps) {
   return (
     <Viewer3DErrorBoundary
       productName={props.productName}
-      fallbackImage={props.fallbackImage || heroFallback}
+      fallbackImage={props.fallbackImage}
       className={props.className}
     >
       <GarmentViewer3DInner {...props} />

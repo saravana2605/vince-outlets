@@ -1,0 +1,13 @@
+dist/
+.output/
+.vinxi/
+.wrangler/
+node_modules/
+package-lock.json
+bun.lock
+vince-outlets/
+image collection/
+new design/
+src/routeTree.gen.ts
+public/models/
+public/draco/

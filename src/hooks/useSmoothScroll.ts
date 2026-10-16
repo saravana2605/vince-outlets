@@ -5,11 +5,15 @@ export function useSmoothScroll() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const reducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    )?.matches;
     if (reducedMotion) return;
 
     // On mobile touchscreens, native momentum scrolling is superior and prevents scroll jank
-    const isCoarse = window.matchMedia?.("(hover: none) and (pointer: coarse)")?.matches;
+    const isCoarse = window.matchMedia?.(
+      "(hover: none) and (pointer: coarse)",
+    )?.matches;
     if (isCoarse) return;
 
     let lenis: Lenis | null = null;

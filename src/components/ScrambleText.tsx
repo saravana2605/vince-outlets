@@ -34,7 +34,9 @@ export function ScrambleText({
     if (isRunningRef.current) return;
     if (typeof window === "undefined") return;
 
-    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const reducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    )?.matches;
     if (reducedMotion) {
       setDisplayText(originalText);
       return;
@@ -51,7 +53,13 @@ export function ScrambleText({
       let result = "";
       for (let i = 0; i < len; i++) {
         const char = originalText[i];
-        if (char === " " || char === "\n" || char === "\t" || char === "—" || char === "-") {
+        if (
+          char === " " ||
+          char === "\n" ||
+          char === "\t" ||
+          char === "—" ||
+          char === "-"
+        ) {
           result += char;
         } else if (i < resolved) {
           result += char;
@@ -71,7 +79,12 @@ export function ScrambleText({
   }, [originalText]);
 
   useEffect(() => {
-    if (!triggerOnArrival || !containerRef.current || typeof window === "undefined") return;
+    if (
+      !triggerOnArrival ||
+      !containerRef.current ||
+      typeof window === "undefined"
+    )
+      return;
     const el = containerRef.current;
 
     let timeoutId: number;
@@ -88,7 +101,7 @@ export function ScrambleText({
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
 
     observer.observe(el);
@@ -98,6 +111,10 @@ export function ScrambleText({
     };
   }, [triggerOnArrival, runDecode, delay]);
 
+  const setRef = useCallback((node: HTMLElement | null) => {
+    containerRef.current = node;
+  }, []);
+
   const handleMouseEnter = () => {
     if (triggerOnHover) {
       runDecode();
@@ -106,7 +123,7 @@ export function ScrambleText({
 
   return (
     <Component
-      ref={containerRef as any}
+      ref={setRef}
       onMouseEnter={handleMouseEnter}
       className={`inline-block tracking-tight ${className}`}
     >

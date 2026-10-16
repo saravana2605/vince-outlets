@@ -18,44 +18,45 @@ export interface GarmentConfig {
   targetScale: number;
 }
 
-export const GARMENTS: readonly [GarmentConfig, GarmentConfig, GarmentConfig] = [
-  {
-    id: "tshirt",
-    indexStr: "01",
-    name: "OVERSIZED T-SHIRT",
-    shortLabel: "01 / T-SHIRT",
-    spec: "240+ GSM COMBED COTTON • OVERSIZED DRAPE",
-    path: "/models/tshirt.glb",
-    requiresDraco: false,
-    defaultRotY: (8 * Math.PI) / 180,
-    defaultRotX: (2 * Math.PI) / 180,
-    targetScale: 1.05,
-  },
-  {
-    id: "longsleeve",
-    indexStr: "02",
-    name: "LONG SLEEVE TEE",
-    shortLabel: "02 / LONG SLEEVE",
-    spec: "260 GSM STRUCTURED JERSEY • RIBBED CUFFS",
-    path: "/models/longsleeve.glb",
-    requiresDraco: false,
-    defaultRotY: (8 * Math.PI) / 180,
-    defaultRotX: (2 * Math.PI) / 180,
-    targetScale: 1.0,
-  },
-  {
-    id: "hoodie",
-    indexStr: "03",
-    name: "HEAVY FLEECE HOODIE",
-    shortLabel: "03 / HOODIE",
-    spec: "430 GSM HEAVYWEIGHT FLEECE • STRUCTURED HOOD",
-    path: "/models/hoodie.glb",
-    requiresDraco: true,
-    defaultRotY: (6 * Math.PI) / 180,
-    defaultRotX: (3 * Math.PI) / 180,
-    targetScale: 0.94,
-  },
-];
+export const GARMENTS: readonly [GarmentConfig, GarmentConfig, GarmentConfig] =
+  [
+    {
+      id: "tshirt",
+      indexStr: "01",
+      name: "OVERSIZED T-SHIRT",
+      shortLabel: "01 / T-SHIRT",
+      spec: "240+ GSM COMBED COTTON • OVERSIZED DRAPE",
+      path: "/models/tshirt.glb",
+      requiresDraco: false,
+      defaultRotY: (8 * Math.PI) / 180,
+      defaultRotX: (2 * Math.PI) / 180,
+      targetScale: 1.05,
+    },
+    {
+      id: "longsleeve",
+      indexStr: "02",
+      name: "LONG SLEEVE TEE",
+      shortLabel: "02 / LONG SLEEVE",
+      spec: "260 GSM STRUCTURED JERSEY • RIBBED CUFFS",
+      path: "/models/longsleeve.glb",
+      requiresDraco: false,
+      defaultRotY: (8 * Math.PI) / 180,
+      defaultRotX: (2 * Math.PI) / 180,
+      targetScale: 1.0,
+    },
+    {
+      id: "hoodie",
+      indexStr: "03",
+      name: "HEAVY FLEECE HOODIE",
+      shortLabel: "03 / HOODIE",
+      spec: "430 GSM HEAVYWEIGHT FLEECE • STRUCTURED HOOD",
+      path: "/models/hoodie.glb",
+      requiresDraco: true,
+      defaultRotY: (6 * Math.PI) / 180,
+      defaultRotX: (3 * Math.PI) / 180,
+      targetScale: 0.94,
+    },
+  ];
 
 interface Garment3DProps {
   className?: string;
@@ -83,7 +84,11 @@ export function Garment3D({
 
   // Sync external index if provided
   useEffect(() => {
-    if (externalIndex !== undefined && externalIndex >= 0 && externalIndex < GARMENTS.length) {
+    if (
+      externalIndex !== undefined &&
+      externalIndex >= 0 &&
+      externalIndex < GARMENTS.length
+    ) {
       setCurrentIndex(externalIndex);
     }
   }, [externalIndex]);
@@ -121,14 +126,16 @@ export function Garment3D({
       externalOnChange?.(safeIndex);
       selectGarmentRef.current(safeIndex);
     },
-    [externalOnChange]
+    [externalOnChange],
   );
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
     // Check prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (prefersReducedMotion) {
       setLoadError(true);
       setLoading(false);
@@ -162,7 +169,10 @@ export function Garment3D({
     const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = pmremGenerator.fromScene(
+      new RoomEnvironment(),
+      0.04,
+    ).texture;
     scene.environmentIntensity = 0.65;
 
     // Ambient light for rich fabric shadow definition
@@ -215,8 +225,8 @@ export function Garment3D({
     const loadedGroups: (THREE.Group | null)[] = [null, null, null];
     const modelDimensions: { height: number; width: number }[] = [
       { height: 1.58, width: 1.38 },
-      { height: 1.70, width: 1.43 },
-      { height: 1.90, width: 1.38 },
+      { height: 1.7, width: 1.43 },
+      { height: 1.9, width: 1.38 },
     ];
 
     let activeIdx = 0;
@@ -224,7 +234,11 @@ export function Garment3D({
     let isDisposed = false;
 
     // Setup material for luxury streetwear presentation
-    function setupModelMaterials(model: THREE.Group, isHoodie: boolean, height: number) {
+    function setupModelMaterials(
+      model: THREE.Group,
+      isHoodie: boolean,
+      height: number,
+    ) {
       model.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
           const mesh = child as THREE.Mesh;
@@ -232,12 +246,17 @@ export function Garment3D({
           mesh.receiveShadow = true;
 
           if (mesh.material) {
-            const origMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+            const origMat = Array.isArray(mesh.material)
+              ? mesh.material[0]
+              : mesh.material;
             const stdMat = origMat as THREE.MeshStandardMaterial;
 
             if (stdMat.map) {
               stdMat.map.colorSpace = THREE.SRGBColorSpace;
-              stdMat.map.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+              stdMat.map.anisotropy = Math.min(
+                renderer.capabilities.getMaxAnisotropy(),
+                8,
+              );
               stdMat.map.needsUpdate = true;
             }
 
@@ -260,13 +279,16 @@ export function Garment3D({
             stdMat.onBeforeCompile = (shader) => {
               shader.uniforms["uLag"] = uLag;
               shader.vertexShader = shader.vertexShader
-                .replace("#include <common>", `#include <common>\nuniform float uLag;`)
+                .replace(
+                  "#include <common>",
+                  `#include <common>\nuniform float uLag;`,
+                )
                 .replace(
                   "#include <begin_vertex>",
                   `#include <begin_vertex>
                   float _ly = clamp(position.y / ${height.toFixed(4)} + 0.5, 0.0, 1.0);
                   float _a = uLag * (1.0 - _ly) * (1.0 - _ly);
-                  transformed.xy = mat2(cos(_a), -sin(_a), sin(_a), cos(_a)) * transformed.xy;`
+                  transformed.xy = mat2(cos(_a), -sin(_a), sin(_a), cos(_a)) * transformed.xy;`,
                 );
             };
           }
@@ -323,7 +345,7 @@ export function Garment3D({
             setLoadError(true);
             setLoading(false);
           }
-        }
+        },
       );
     }
 
@@ -360,11 +382,12 @@ export function Garment3D({
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
 
-      const activeDims = modelDimensions[activeIdx] ?? modelDimensions[0] ?? { height: 1.5, width: 1.4 };
+      const activeDims = modelDimensions[activeIdx] ??
+        modelDimensions[0] ?? { height: 1.5, width: 1.4 };
       const halfFovRad = ((camera.fov / 2) * Math.PI) / 180;
-      const distH = (activeDims.height / 2) / (Math.tan(halfFovRad) * 0.85);
+      const distH = activeDims.height / 2 / (Math.tan(halfFovRad) * 0.85);
       const halfHorizFovRad = Math.atan(Math.tan(halfFovRad) * camera.aspect);
-      const distW = (activeDims.width / 2) / (Math.tan(halfHorizFovRad) * 0.85);
+      const distW = activeDims.width / 2 / (Math.tan(halfHorizFovRad) * 0.85);
 
       targetCameraDist = Math.max(distH, distW, 2.5);
     }
@@ -389,7 +412,7 @@ export function Garment3D({
       ([entry]) => {
         isVisible = Boolean(entry?.isIntersecting);
       },
-      { threshold: 0.05 }
+      { threshold: 0.05 },
     );
     observer.observe(container);
 
@@ -429,7 +452,11 @@ export function Garment3D({
           group.scale.setScalar(s);
         } else {
           const currentS = group.scale.x;
-          const s = THREE.MathUtils.lerp(currentS, config.targetScale * 0.9, 0.16);
+          const s = THREE.MathUtils.lerp(
+            currentS,
+            config.targetScale * 0.9,
+            0.16,
+          );
           group.scale.setScalar(s);
           if (s < config.targetScale * 0.92) {
             group.visible = false;
@@ -469,9 +496,11 @@ export function Garment3D({
       const idleY = Math.sin(time / 2600) * 0.012;
 
       const activeConfig = GARMENTS[activeIdx] ?? GARMENTS[0];
-      rollGroup.rotation.x = activeConfig.defaultRotX + p.userRotX + p.currentTiltX;
+      rollGroup.rotation.x =
+        activeConfig.defaultRotX + p.userRotX + p.currentTiltX;
       rollGroup.rotation.z = -p.currentTiltY * 0.35;
-      turnGroup.rotation.y = activeConfig.defaultRotY + p.userRotY + p.currentTiltY;
+      turnGroup.rotation.y =
+        activeConfig.defaultRotY + p.userRotY + p.currentTiltY;
       rollGroup.position.set(0, idleY, 0);
 
       // Fabric wave lag
@@ -479,7 +508,7 @@ export function Garment3D({
       const turnVel = currentTurn - prevTurnY;
       prevTurnY = currentTurn;
 
-      jig += (((p.tiltVelY + p.tiltVelX) * 4 + turnVel * 1.5) - jig) * 0.18;
+      jig += ((p.tiltVelY + p.tiltVelX) * 4 + turnVel * 1.5 - jig) * 0.18;
       const limit = (18 * Math.PI) / 180;
       uLag.value = limit * Math.tanh((jig * 1.5) / limit);
 
@@ -546,29 +575,38 @@ export function Garment3D({
 
         if (!hasInteracted) setHasInteracted(true);
       } else {
-        const nx = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1));
-        const ny = Math.max(-1, Math.min(1, ((e.clientY - rect.top) / rect.height) * 2 - 1));
+        const nx = Math.max(
+          -1,
+          Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1),
+        );
+        const ny = Math.max(
+          -1,
+          Math.min(1, ((e.clientY - rect.top) / rect.height) * 2 - 1),
+        );
 
         p.targetTiltY = (nx * 10 * Math.PI) / 180;
         p.targetTiltX = (ny * 6 * Math.PI) / 180;
         p.isHovered = true;
       }
     },
-    [interactive, hasInteracted]
+    [interactive, hasInteracted],
   );
 
-  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    setIsPaused(true); // Pause auto-rotation on touch/click
-    const p = pointerState.current;
-    p.isResetting = false;
-    p.isDragging = true;
-    p.dragStartX = e.clientX;
-    p.dragStartY = e.clientY;
-    p.lastDragX = e.clientX;
-    p.lastDragY = e.clientY;
-    p.userRotVelX = 0;
-    p.userRotVelY = 0;
-  }, []);
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      setIsPaused(true); // Pause auto-rotation on touch/click
+      const p = pointerState.current;
+      p.isResetting = false;
+      p.isDragging = true;
+      p.dragStartX = e.clientX;
+      p.dragStartY = e.clientY;
+      p.lastDragX = e.clientX;
+      p.lastDragY = e.clientY;
+      p.userRotVelX = 0;
+      p.userRotVelY = 0;
+    },
+    [],
+  );
 
   const handlePointerUp = useCallback(() => {
     pointerState.current.isDragging = false;
@@ -683,7 +721,9 @@ export function Garment3D({
             <span className="font-mono text-[9px] sm:text-[10px] text-white font-bold tracking-wider">
               {activeGarment.name}
             </span>
-            <span className="text-white/30 font-mono text-[9px] hidden sm:inline">|</span>
+            <span className="text-white/30 font-mono text-[9px] hidden sm:inline">
+              |
+            </span>
             <span className="font-mono text-[9px] text-[#F4D477] hidden sm:inline">
               {activeGarment.spec}
             </span>
