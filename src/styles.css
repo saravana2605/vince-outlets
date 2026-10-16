@@ -157,6 +157,7 @@
     color: var(--content);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
     overflow-x: clip;
   }
 }
@@ -164,7 +165,9 @@
 /* ═══ LUXURY STREETWEAR ATMOSPHERE ═══ */
 #shell {
   position: relative;
+  min-height: 100vh;
   min-height: 100svh;
+  overflow-x: hidden;
   overflow-x: clip;
   background-color: #06080a;
   background-image:
@@ -471,3 +474,16 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }
+
+/* Safe-area insets for iPhone notch, Dynamic Island and Home indicator */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.floating-action-group {
+  position: fixed;
+  z-index: 45;
+  right: max(0.875rem, env(safe-area-inset-right, 0px));
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+}
+

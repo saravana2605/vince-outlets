@@ -2,6 +2,8 @@ import { useEffect } from "react";
 
 export function usePointerLattice() {
   useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
     const isCoarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Production build & Vinxi / Nitro outputs
+.output/
+dist/
+.wrangler/
+.vinxi/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE / System
+.DS_Store
+Thumbs.db
+
+# Sub-repo / untracked scratch
+vince-outlets/
+
+# Raw design & unoptimized source assets
+image collection/
+new design/
+

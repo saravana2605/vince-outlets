@@ -1,24 +1,86 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, Component, type ReactNode } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import heroFallback from "@/assets/hero.jpg";
+import heroFallback from "@/assets/products/racing-collage-tee.webp";
 
 export interface GarmentViewer3DProps {
   modelPath: string;
   productName: string;
-  requiresDraco?: boolean;
+  requiresDraco?: boolean | undefined;
   selectedColorHex: string;
-  defaultScale?: number;
-  defaultRotY?: number;
-  defaultRotX?: number;
-  isHoodie?: boolean;
-  className?: string;
-  fallbackImage?: string;
+  defaultScale?: number | undefined;
+  defaultRotY?: number | undefined;
+  defaultRotX?: number | undefined;
+  isHoodie?: boolean | undefined;
+  className?: string | undefined;
+  fallbackImage?: string | undefined;
 }
 
-// High-fidelity material color calibrator for realistic garment rendering
+// Check WebGL availability safely and release test context immediately to avoid GPU memory leaks
+function isWebGLAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    if (!gl) return false;
+    const loseContext = (gl as any).getExtension?.("WEBGL_lose_context");
+    loseContext?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Module-level shared Draco loader to avoid spawning duplicate Web Workers
+let sharedDracoLoader: DRACOLoader | null = null;
+function getSharedDracoLoader(): DRACOLoader {
+  if (!sharedDracoLoader) {
+    sharedDracoLoader = new DRACOLoader();
+    sharedDracoLoader.setDecoderPath("/draco/");
+  }
+  return sharedDracoLoader;
+}
+
+// Module-level model cache to avoid re-fetching or re-decoding 1.5MB GLBs
+const modelCache = new Map<string, Promise<THREE.Group>>();
+
+function loadCachedModel(modelPath: string, requiresDraco: boolean): Promise<THREE.Group> {
+  const existing = modelCache.get(modelPath);
+  if (existing) return existing;
+
+  const promise = new Promise<THREE.Group>((resolve, reject) => {
+    const loader = new GLTFLoader();
+    if (requiresDraco) {
+      try {
+        loader.setDRACOLoader(getSharedDracoLoader());
+      } catch (e) {
+        console.warn("Draco loader initialization warning:", e);
+      }
+    }
+
+    loader.load(
+      modelPath,
+      (gltf) => {
+        resolve(gltf.scene);
+      },
+      undefined,
+      (error) => {
+        console.warn(`Failed to load 3D model ${modelPath}:`, error);
+        modelCache.delete(modelPath);
+        reject(error);
+      }
+    );
+  });
+
+  modelCache.set(modelPath, promise);
+  return promise;
+}
+
+// High-fidelity material color calibrator for realistic streetwear garment rendering
 export function applyGarmentColor(
   mat: THREE.MeshStandardMaterial,
   hexColor: string,
@@ -27,18 +89,17 @@ export function applyGarmentColor(
   const hex = hexColor.toUpperCase();
 
   if (hex === "#FFFFFF") {
-    // Pure White — Clean, bright white while preserving fabric weave and realistic fold shading
+    // Pure White — Crisp streetwear white while preserving photorealistic fabric fold shading
     if (isHoodie) {
-      // Compensate for raw fleece texture's warm undertone (R=196, G=188, B=173) to render crisp, bright white
-      mat.color.setRGB(1.28, 1.30, 1.45);
+      mat.color.setRGB(1.24, 1.26, 1.38);
     } else {
-      mat.color.setRGB(1.16, 1.16, 1.16);
+      mat.color.setRGB(1.14, 1.14, 1.14);
     }
   } else if (hex === "#111111") {
-    // Jet Black — Deep rich black with clear visibility of stitches, seams and wrinkles
+    // Jet Black — Deep rich charcoal-black with visible seams, stitching and wrinkle shadows
     mat.color.setRGB(0.068, 0.068, 0.068);
   } else if (hex === "#D71920") {
-    // Racing Red — Saturated, rich streetwear red
+    // Racing Red — Saturated, bold streetwear red
     if (isHoodie) {
       mat.color.setRGB(0.92, 0.09, 0.12);
     } else {
@@ -52,7 +113,7 @@ export function applyGarmentColor(
       mat.color.setRGB(0.07, 0.24, 0.52);
     }
   } else if (hex === "#F47721") {
-    // Vibrant Orange — Bold, punchy streetwear orange
+    // Vibrant Orange — Punchy, high-energy streetwear orange
     mat.color.setRGB(0.98, 0.45, 0.11);
   } else if (hex === "#A7A9AC") {
     // Heather Grey — Balanced neutral athletic grey
@@ -68,7 +129,79 @@ export function applyGarmentColor(
   mat.needsUpdate = true;
 }
 
-export function GarmentViewer3D({
+// Self-contained visual fallback card
+export function GarmentFallbackCard({
+  productName,
+  fallbackImage,
+  className = "",
+}: {
+  productName: string;
+  fallbackImage: string;
+  className?: string | undefined;
+}) {
+  return (
+    <div
+      className={`relative flex items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-[#0d1115] ${className}`}
+    >
+      <img
+        src={fallbackImage}
+        alt={productName}
+        width={1024}
+        height={1024}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover object-center drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
+      />
+      <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-sm border border-white/10 bg-[#06080a]/90 px-3 py-1 font-mono text-[10px] tracking-wider text-[#f4d477] backdrop-blur-md">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#d4a62a]" />
+        {productName} • PREVIEW
+      </div>
+    </div>
+  );
+}
+
+// Dedicated Error Boundary around 3D viewports to guarantee complete website safety
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  productName: string;
+  fallbackImage: string;
+  className?: string | undefined;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+export class Viewer3DErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  override componentDidCatch(error: unknown) {
+    console.warn(`3D Viewport error caught for ${this.props.productName}:`, error);
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      return (
+        <GarmentFallbackCard
+          productName={this.props.productName}
+          fallbackImage={this.props.fallbackImage}
+          className={this.props.className}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Inner 3D WebGL Canvas implementation
+function GarmentViewer3DInner({
   modelPath,
   productName,
   requiresDraco = false,
@@ -87,8 +220,11 @@ export function GarmentViewer3D({
   const [loadError, setLoadError] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // References to keep mutable Three.js objects without re-triggering effects
-  const targetMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  // Prioritize T-shirt for instant hero presentation, lazy-load Hoodie and Longsleeve
+  const isTshirt = modelPath.includes("tshirt");
+  const [isNearViewport, setIsNearViewport] = useState(isTshirt);
+
+  const targetMaterialsRef = useRef<THREE.MeshStandardMaterial[]>([]);
   const resetViewRef = useRef<() => void>(() => {});
   const requestRenderRef = useRef<() => void>(() => {});
 
@@ -112,71 +248,122 @@ export function GarmentViewer3D({
     isResetting: false,
   });
 
-  // Effect to update material color dynamically without re-mounting or reloading GLB
+  // Observe viewport proximity so Hoodie and Longsleeve WebGL contexts are only allocated when needed
   useEffect(() => {
-    if (targetMaterialRef.current) {
-      applyGarmentColor(targetMaterialRef.current, selectedColorHex, isHoodie);
-      requestRenderRef.current();
+    if (isTshirt || isNearViewport) return;
+    const container = containerRef.current;
+    if (!container || typeof IntersectionObserver === "undefined") {
+      setIsNearViewport(true);
+      return;
     }
+
+    const proximityObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsNearViewport(true);
+          proximityObserver.disconnect();
+        }
+      },
+      { rootMargin: "350px 0px" }
+    );
+
+    proximityObserver.observe(container);
+    return () => proximityObserver.disconnect();
+  }, [isTshirt, isNearViewport]);
+
+  // Dynamically apply garment color to fabric materials
+  useEffect(() => {
+    targetMaterialsRef.current.forEach((mat) => {
+      applyGarmentColor(mat, selectedColorHex, isHoodie);
+    });
+    requestRenderRef.current();
   }, [selectedColorHex, isHoodie]);
 
   // Main Three.js Scene Setup
   useEffect(() => {
+    if (!isNearViewport) return;
+
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
 
+    if (!isWebGLAvailable()) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
+
     let isDisposed = false;
+    let isContextLost = false;
+    let renderer: THREE.WebGLRenderer | null = null;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance",
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.22;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // Device Pixel Ratio & Mobile detection
+    const isCoarse =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    // On iPhone/mobile devices, limit DPR to 1.5 to protect GPU memory and prevent context loss
+    const maxDpr = isCoarse ? 1.5 : 2.0;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
 
-    // Scene & Environment
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: !isCoarse,
+        alpha: true,
+        powerPreference: isCoarse ? "default" : "high-performance",
+        stencil: false,
+        depth: true,
+      });
+      renderer.setPixelRatio(dpr);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.18;
+      renderer.shadowMap.enabled = false;
+    } catch (err) {
+      console.warn(`Could not initialize WebGL renderer for ${productName}:`, err);
+      if (!isDisposed) {
+        setLoadError(true);
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Context loss handler
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      console.warn(`WebGL context lost for ${productName}. Switching to high-res preview.`);
+      isContextLost = true;
+      if (!isDisposed) {
+        setLoadError(true);
+      }
+    };
+    canvas.addEventListener("webglcontextlost", onContextLost, false);
+
+    // Scene
     const scene = new THREE.Scene();
-    const pmremGen = new THREE.PMREMGenerator(renderer);
-    pmremGen.compileEquirectangularShader();
-    const envRoom = pmremGen.fromScene(new RoomEnvironment());
-    scene.environment = envRoom.texture;
 
     // Camera
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40);
     camera.position.set(0, 0.05, 3.2);
 
-    // Ambient light so deep crevices and black fabric folds remain readable
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    // Studio 4-Point Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
     scene.add(ambientLight);
 
-    // Balanced High-CRI Studio Lighting
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
+    const keyLight = new THREE.DirectionalLight(0xfff8ee, 2.8);
     keyLight.position.set(3.2, 4.2, 3.5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
-    keyLight.shadow.bias = -0.0004;
     scene.add(keyLight);
 
-    // Clean neutral rim light for crisp silhouette definition against dark background
-    const rimLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    const rimLight = new THREE.DirectionalLight(0xf4d477, 2.4);
     rimLight.position.set(-3.5, 2.5, -2.8);
     scene.add(rimLight);
 
-    // Soft cool fill
-    const fillLight = new THREE.DirectionalLight(0xf0f4f8, 1.2);
+    const fillLight = new THREE.DirectionalLight(0xd9e5f2, 1.3);
     fillLight.position.set(0, -2.5, 2.5);
     scene.add(fillLight);
 
-    // Damped hierarchy
+    // Damped hierarchy for smooth turn & tilt
     const rollGroup = new THREE.Group();
     const turnGroup = new THREE.Group();
     rollGroup.add(turnGroup);
@@ -193,23 +380,16 @@ export function GarmentViewer3D({
       p.isDragging = false;
     };
 
-    // Loaders
-    const gltfLoader = new GLTFLoader();
-    if (requiresDraco) {
-      const dracoLoader = new DRACOLoader();
-      dracoLoader.setDecoderPath("/draco/");
-      gltfLoader.setDRACOLoader(dracoLoader);
-    }
-
     let loadedModel: THREE.Group | null = null;
     let modelHeight = 1.5;
     let modelWidth = 1.4;
 
-    gltfLoader.load(
-      modelPath,
-      (gltf) => {
-        if (isDisposed) return;
-        const model = gltf.scene;
+    // Load or retrieve model from cache
+    loadCachedModel(modelPath, requiresDraco)
+      .then((sourceScene) => {
+        if (isDisposed || isContextLost) return;
+
+        const model = sourceScene.clone(true);
         loadedModel = model;
 
         const box = new THREE.Box3().setFromObject(model);
@@ -219,30 +399,26 @@ export function GarmentViewer3D({
         modelHeight = Math.max(size.y, 0.001);
         modelWidth = Math.max(size.x, 0.001);
 
-        // Center model pivot
         model.position.sub(center);
 
-        // Configure and CLONE material for this independent viewer
+        // Configure and clone materials for independent colour control
+        const newMaterials: THREE.MeshStandardMaterial[] = [];
+
         model.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-
             if (mesh.material) {
               const origMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
               const clonedMat = (origMat as THREE.MeshStandardMaterial).clone();
               mesh.material = clonedMat;
-              targetMaterialRef.current = clonedMat;
+              newMaterials.push(clonedMat);
 
               if (clonedMat.map) {
                 clonedMat.map.colorSpace = THREE.SRGBColorSpace;
-                clonedMat.map.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
                 clonedMat.map.needsUpdate = true;
               }
 
               if (isHoodie) {
-                // Tame raw hoodie emissive blowout
                 if (clonedMat.emissive) {
                   clonedMat.emissive.setHex(0x000000);
                 }
@@ -253,7 +429,6 @@ export function GarmentViewer3D({
                 clonedMat.metalness = 0.0;
               }
 
-              // Apply the currently selected color tint immediately (Pure White by default)
               applyGarmentColor(clonedMat, selectedColorHex, isHoodie);
               clonedMat.side = THREE.DoubleSide;
               clonedMat.needsUpdate = true;
@@ -261,31 +436,30 @@ export function GarmentViewer3D({
           }
         });
 
+        targetMaterialsRef.current = newMaterials;
         model.scale.setScalar(defaultScale);
         turnGroup.add(model);
 
         setLoading(false);
         handleResize();
-      },
-      undefined,
-      (err) => {
-        console.warn(`Error loading model ${modelPath}:`, err);
+        requestRenderRef.current();
+      })
+      .catch((err) => {
+        console.warn(`Error loading model for ${productName}:`, err);
         if (!isDisposed) {
           setLoadError(true);
           setLoading(false);
         }
-      }
-    );
+      });
 
     // Resize math
     function handleResize() {
-      if (!container || !canvas || isDisposed) return;
+      if (!container || !canvas || !renderer || isDisposed || isContextLost) return;
       const rect = container.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
       if (!w || !h) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
 
@@ -293,9 +467,9 @@ export function GarmentViewer3D({
       camera.updateProjectionMatrix();
 
       const halfFovRad = ((camera.fov / 2) * Math.PI) / 180;
-      const distH = (modelHeight / 2) / (Math.tan(halfFovRad) * 0.85);
+      const distH = modelHeight / 2 / (Math.tan(halfFovRad) * 0.85);
       const halfHorizFovRad = Math.atan(Math.tan(halfFovRad) * camera.aspect);
-      const distW = (modelWidth / 2) / (Math.tan(halfHorizFovRad) * 0.85);
+      const distW = modelWidth / 2 / (Math.tan(halfHorizFovRad) * 0.85);
 
       camera.position.z = Math.max(distH, distW, 2.5);
     }
@@ -303,35 +477,21 @@ export function GarmentViewer3D({
     window.addEventListener("resize", handleResize, { passive: true });
     handleResize();
 
-    // IntersectionObserver to pause loop when scrolled out of view
+    // Active-only rendering loop: completely halt rAF when scrolled out of view to preserve mobile battery & GPU
     let isVisible = true;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = Boolean(entry?.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(container);
-
-    let isTabActive = !document.hidden;
-    const handleVisibilityChange = () => {
-      isTabActive = !document.hidden;
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Render loop
     let animId = 0;
     const SPRING_K = 0.07;
     const SPRING_D = 0.82;
 
     function renderLoop(time: number) {
+      if (!isVisible || !isTabActive || isContextLost || !renderer) {
+        animId = 0;
+        return;
+      }
       animId = requestAnimationFrame(renderLoop);
-
-      if (!isVisible || !isTabActive) return;
 
       const p = pointerState.current;
 
-      // Smooth return to default viewing angle when reset is clicked
       if (p.isResetting) {
         p.userRotX += (0 - p.userRotX) * 0.12;
         p.userRotY += (0 - p.userRotY) * 0.12;
@@ -350,7 +510,6 @@ export function GarmentViewer3D({
         p.userRotY += p.userRotVelY;
       }
 
-      // Smooth hover spring tilt
       p.tiltVelX += (p.targetTiltX - p.currentTiltX) * SPRING_K;
       p.tiltVelX *= SPRING_D;
       p.currentTiltX += p.tiltVelX;
@@ -359,7 +518,6 @@ export function GarmentViewer3D({
       p.tiltVelY *= SPRING_D;
       p.currentTiltY += p.tiltVelY;
 
-      // Gentle vertical breath (NO continuous 360 spinning)
       const idleY = Math.sin(time / 2600) * 0.012;
 
       rollGroup.rotation.x = defaultRotX + p.userRotX + p.currentTiltX;
@@ -367,43 +525,94 @@ export function GarmentViewer3D({
       turnGroup.rotation.y = defaultRotY + p.userRotY + p.currentTiltY;
       rollGroup.position.set(0, idleY, 0);
 
-      renderer.render(scene, camera);
+      try {
+        renderer.render(scene, camera);
+      } catch (e) {
+        console.warn("Render loop error:", e);
+      }
     }
 
-    animId = requestAnimationFrame(renderLoop);
+    function startLoopIfNeeded() {
+      if (!animId && isVisible && isTabActive && !isContextLost && renderer) {
+        animId = requestAnimationFrame(renderLoop);
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nowVisible = Boolean(entry?.isIntersecting);
+        if (nowVisible !== isVisible) {
+          isVisible = nowVisible;
+          if (isVisible) {
+            handleResize();
+            startLoopIfNeeded();
+          } else if (animId) {
+            cancelAnimationFrame(animId);
+            animId = 0;
+          }
+        }
+      },
+      { threshold: 0.02, rootMargin: "100px" }
+    );
+    observer.observe(container);
+
+    let isTabActive = !document.hidden;
+    const handleVisibilityChange = () => {
+      isTabActive = !document.hidden;
+      if (isTabActive) {
+        startLoopIfNeeded();
+      } else if (animId) {
+        cancelAnimationFrame(animId);
+        animId = 0;
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    startLoopIfNeeded();
+
     requestRenderRef.current = () => {
-      renderer.render(scene, camera);
+      if (renderer && !isContextLost && isVisible) {
+        try {
+          renderer.render(scene, camera);
+        } catch {
+          // ignore
+        }
+      }
     };
 
     // Cleanup
     return () => {
       isDisposed = true;
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
       observer.disconnect();
 
       if (loadedModel) {
         loadedModel.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
-            mesh.geometry.dispose();
             const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
             mats.forEach((m) => {
-              (m as THREE.MeshStandardMaterial).map?.dispose();
-              m.dispose();
+              m?.dispose();
             });
           }
         });
       }
 
-      envRoom.dispose();
-      pmremGen.dispose();
-      renderer.dispose();
+      if (renderer) {
+        try {
+          renderer.dispose();
+          renderer.forceContextLoss();
+        } catch {
+          // ignore
+        }
+      }
     };
-  }, [modelPath, requiresDraco, defaultScale, defaultRotY, defaultRotX, isHoodie]);
+  }, [isNearViewport, modelPath, requiresDraco, defaultScale, defaultRotY, defaultRotX, isHoodie, productName]);
 
-  // Pointer interactions
+  // Pointer interactions with mobile touch scroll preservation
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const container = containerRef.current;
     if (!container) return;
@@ -443,9 +652,26 @@ export function GarmentViewer3D({
     p.lastDragY = e.clientY;
     p.userRotVelX = 0;
     p.userRotVelY = 0;
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
   }, []);
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    pointerState.current.isDragging = false;
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handlePointerCancel = useCallback(() => {
     pointerState.current.isDragging = false;
   }, []);
 
@@ -459,21 +685,11 @@ export function GarmentViewer3D({
 
   if (loadError) {
     return (
-      <div
-        className={`relative flex items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-[#0d1115] ${className}`}
-      >
-        <img
-          src={fallbackImage}
-          alt={productName}
-          width={1024}
-          height={1024}
-          className="h-full w-full object-cover object-center drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)]"
-        />
-        <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-sm border border-white/10 bg-[#06080a]/85 px-3 py-1 font-mono text-[10px] tracking-wider text-[#f4d477] backdrop-blur-md">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#d4a62a]" />
-          {productName} • PREVIEW
-        </div>
-      </div>
+      <GarmentFallbackCard
+        productName={productName}
+        fallbackImage={fallbackImage}
+        className={className}
+      />
     );
   }
 
@@ -483,9 +699,10 @@ export function GarmentViewer3D({
       onPointerMove={handlePointerMove}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       onPointerLeave={handlePointerLeave}
       className={`relative select-none ${className}`}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "pan-y" }}
     >
       <canvas
         ref={canvasRef}
@@ -493,7 +710,7 @@ export function GarmentViewer3D({
       />
 
       {/* Lightweight Loading State */}
-      {loading && (
+      {loading && isNearViewport && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#06080a]/80 backdrop-blur-sm z-20">
           <div className="flex items-center gap-2.5 font-mono text-xs tracking-widest text-[#f4d477]">
             <span className="inline-block h-2 w-2 animate-ping rounded-full bg-[#d4a62a]" />
@@ -526,5 +743,18 @@ export function GarmentViewer3D({
         )}
       </div>
     </div>
+  );
+}
+
+// Exported GarmentViewer3D wrapped in safe Error Boundary
+export function GarmentViewer3D(props: GarmentViewer3DProps) {
+  return (
+    <Viewer3DErrorBoundary
+      productName={props.productName}
+      fallbackImage={props.fallbackImage || heroFallback}
+      className={props.className}
+    >
+      <GarmentViewer3DInner {...props} />
+    </Viewer3DErrorBoundary>
   );
 }

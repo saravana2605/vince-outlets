@@ -6,11 +6,12 @@ import {
   FullSleeveSection,
   CustomEnquiry,
   Shop,
+  PrintArchive,
   Why,
   Bulk,
   ContactSection,
   Footer,
-  FloatingWhatsApp,
+  FloatingActionGroup,
 } from "@/components/site";
 import { PRODUCTS, INSTAGRAM } from "@/lib/site-data";
 import { usePointerLattice } from "@/hooks/usePointerLattice";
@@ -75,16 +76,18 @@ function Index() {
         <CustomEnquiry />
         {/* 5. READY-TO-WEAR COLLECTION */}
         <Shop />
-        {/* 6. WHY VINCE OUTLETS */}
+        {/* 6. BESPOKE PRINT ARCHIVE // COMPLETE GRAPHIC COLLECTION */}
+        <PrintArchive />
+        {/* 7. WHY VINCE OUTLETS */}
         <Why />
-        {/* 7. BULK & SQUAD MERCH */}
+        {/* 8. BULK & SQUAD MERCH */}
         <Bulk />
-        {/* 8. PUDUCHERRY STUDIO & CONTACT */}
+        {/* 9. PUDUCHERRY STUDIO & CONTACT */}
         <ContactSection />
       </main>
       {/* FOOTER */}
       <Footer />
-      <FloatingWhatsApp />
+      <FloatingActionGroup />
     </div>
   );
 }

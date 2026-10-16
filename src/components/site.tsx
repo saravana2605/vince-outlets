@@ -19,17 +19,31 @@ import {
   ChevronDown,
   Eye,
   SlidersHorizontal,
+  Maximize2,
+  Tag,
 } from "lucide-react";
 import vincelogoOpt from "@/assets/vincelogo-opt.png";
 import hero from "@/assets/hero.jpg";
-import customTee from "@/assets/custom-tee.jpg";
-import culture from "@/assets/culture.jpg";
-import squad from "@/assets/squad.jpg";
-import hoodie from "@/assets/hoodie.jpg";
-import sweatshirt from "@/assets/sweatshirt.jpg";
-import polo from "@/assets/polo.jpg";
-import croptop from "@/assets/croptop.jpg";
-import kids from "@/assets/kids.jpg";
+
+// New authentic collection images from Puducherry workshop
+import racingCollageTee from "@/assets/products/racing-collage-tee.webp";
+import thalapathyPosterTee from "@/assets/products/thalapathy-poster-tee.webp";
+import ajithThalaTee from "@/assets/products/ajith-thala-tee.webp";
+import strFilmCollageTee from "@/assets/products/str-film-collage-tee.webp";
+import burgundyCartoonTee from "@/assets/products/burgundy-cartoon-tee.webp";
+import dhoniTributeTee from "@/assets/products/dhoni-tribute-tee.webp";
+import murugaVelTee from "@/assets/products/muruga-vel-tee.webp";
+import neonSceneTee from "@/assets/products/neon-scene-tee.webp";
+import redDragonTee from "@/assets/products/red-dragon-tee.webp";
+import sureshRainaTee from "@/assets/products/suresh-raina-tee.webp";
+import festivalOffersPoster from "@/assets/products/festival-offers-poster.webp";
+import vintageMuruganTee from "@/assets/products/vintage-murugan-tee.webp";
+import hoodie from "@/assets/products/hoodie-optimized.webp";
+import sweatshirt from "@/assets/products/sweatshirt-optimized.webp";
+import blackSweatshirt from "@/assets/products/black-sweatshirt.webp";
+import betterDaysSweatshirt from "@/assets/products/better-days-sweatshirt.webp";
+import cloudmasaLogo from "@/assets/cloudmasa-logo.png";
+
 import {
   PRODUCTS,
   MSG,
@@ -37,8 +51,14 @@ import {
   productMsg,
   inr,
   INSTAGRAM,
+  GOOGLE_REVIEWS_URL,
+  CLOUDMASA_URL,
   PHONE,
+  PHONE_ALT,
   WA_DISPLAY,
+  WA_DISPLAY_ALT,
+  WA_NUMBER,
+  WA_NUMBER_ALT,
   ADDRESS,
   MAPS_URL,
   MAPS_EMBED,
@@ -47,25 +67,26 @@ import {
 import { GarmentViewer3D } from "@/components/GarmentViewer3D";
 import { ScrambleText } from "@/components/ScrambleText";
 
+// Front primary view (Angle 1) mapped to authentic streetwear mockups
 const PRODUCT_IMAGES: Record<string, string> = {
-  "OVERSIZED - UNISEX": hero,
-  "REGULAR FIT - UNISEX": customTee,
+  "OVERSIZED - UNISEX": racingCollageTee,
+  "REGULAR FIT - UNISEX": ajithThalaTee,
   "HOODIE - UNISEX": hoodie,
-  "SWEATSHIRT - UNISEX": sweatshirt,
-  "POLO - UNISEX": polo,
-  "CROPTOPS": croptop,
-  "KIDS - UNISEX": kids,
+  "SWEATSHIRT - UNISEX": blackSweatshirt,
+  "POLO - UNISEX": burgundyCartoonTee,
+  "CROPTOPS": neonSceneTee,
+  "KIDS - UNISEX": vintageMuruganTee,
 };
 
-// Secondary detail views for angle toggle
+// Secondary detail views for angle toggle (Angle 2 / Back / Alternate graphic)
 const PRODUCT_IMAGES_BACK: Record<string, string> = {
-  "OVERSIZED - UNISEX": customTee,
-  "REGULAR FIT - UNISEX": hero,
+  "OVERSIZED - UNISEX": thalapathyPosterTee,
+  "REGULAR FIT - UNISEX": strFilmCollageTee,
   "HOODIE - UNISEX": hoodie,
-  "SWEATSHIRT - UNISEX": customTee,
-  "POLO - UNISEX": polo,
-  "CROPTOPS": croptop,
-  "KIDS - UNISEX": kids,
+  "SWEATSHIRT - UNISEX": betterDaysSweatshirt,
+  "POLO - UNISEX": dhoniTributeTee,
+  "CROPTOPS": redDragonTee,
+  "KIDS - UNISEX": sureshRainaTee,
 };
 
 const NAV = [
@@ -74,6 +95,7 @@ const NAV = [
   ["HOODIE 3D", "#custom-hoodie"],
   ["FULL SLEEVE 3D", "#custom-fullsleeve"],
   ["COLLECTION", "#collection"],
+  ["ARCHIVE", "#archive"],
   ["WHY VINCE", "#why"],
   ["BULK ORDERS", "#bulk"],
   ["STUDIO", "#contact"],
@@ -99,6 +121,29 @@ export function WhatsAppIcon({
     >
       <path d="M17.472 14.382c-.301-.15-1.782-.879-2.057-.98-.276-.1-.476-.15-.676.15-.2.301-.776.98-.952 1.18-.175.201-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.896-.799-1.502-1.787-1.677-2.088-.176-.301-.019-.464.132-.614.135-.136.301-.351.451-.527.151-.175.201-.3.301-.501.1-.201.05-.376-.025-.526-.075-.151-.676-1.629-.927-2.23-.244-.587-.493-.507-.677-.517l-.577-.01c-.2 0-.526.075-.802.376-.276.301-1.052 1.028-1.052 2.507 0 1.479 1.078 2.908 1.228 3.109.15.201 2.121 3.238 5.138 4.542.718.31 1.279.496 1.716.634.721.229 1.377.197 1.896.12.578-.087 1.782-.727 2.032-1.429.251-.702.251-1.303.176-1.429-.076-.126-.276-.201-.577-.351z" />
       <path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.954.563 3.778 1.536 5.32L2 22l4.82-1.498a9.96 9.96 0 0 0 5.184 1.506c5.518 0 10.004-4.486 10.004-10.004C22.008 6.486 17.522 2 12.004 2zm0 18.243c-1.623 0-3.14-.46-4.444-1.258l-.319-.193-2.862.89.907-2.79-.208-.33a8.217 8.217 0 0 1-1.314-4.568c0-4.565 3.714-8.279 8.24-8.279 4.526 0 8.24 3.714 8.24 8.279 0 4.565-3.714 8.279-8.24 8.279z" />
+    </svg>
+  );
+}
+
+export function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <path
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+        fill="#EA4335"
+      />
     </svg>
   );
 }
@@ -614,7 +659,7 @@ export function Hero() {
                   defaultRotY={(8 * Math.PI) / 180}
                   defaultRotX={(2 * Math.PI) / 180}
                   isHoodie={false}
-                  fallbackImage={hero}
+                  fallbackImage={racingCollageTee}
                   className="h-full w-full"
                 />
               </div>
@@ -708,7 +753,7 @@ export function HoodieSection() {
               <div className="text-right shrink-0">
                 <span className="font-mono text-[10px] text-[#a3a3a3] block uppercase">STARTING AT</span>
                 <span className="font-mono text-base sm:text-lg font-bold text-[#F4D477]">
-                  {inr(1499)}
+                  {inr(899)}
                 </span>
               </div>
             </div>
@@ -913,7 +958,7 @@ export function FullSleeveSection() {
                 defaultScale={1.12}
                 defaultRotY={(8 * Math.PI) / 180}
                 defaultRotX={(2 * Math.PI) / 180}
-                fallbackImage={customTee}
+                fallbackImage={sweatshirt}
                 className="h-full w-full"
               />
             </div>
@@ -994,11 +1039,11 @@ export function CustomEnquiry() {
           <Reveal className="panel relative overflow-hidden rounded-sm p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/10">
             <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-[#04070a]">
               <img
-                src={customTee}
-                alt="Custom printed oversized black streetwear tee with silver graphics"
+                src={murugaVelTee}
+                alt="1-of-1 bespoke Muruga Vel sacred graphic black streetwear tee by Vince Outlets Puducherry"
                 loading="lazy"
-                width={1024}
-                height={1280}
+                width={1145}
+                height={1374}
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#04070a] via-transparent to-transparent opacity-80 pointer-events-none" />
@@ -1096,7 +1141,7 @@ export const Culture = () => null;
 /* ═══ PRODUCT CARD WITH 3D PERSPECTIVE TILT ═══ */
 export function ProductCard({ p, i }: { p: Product; i: number }) {
   const save = Math.round(((p.old - p.price) / p.old) * 100);
-  const frontImg = PRODUCT_IMAGES[p.name] || hero;
+  const frontImg = PRODUCT_IMAGES[p.name] || racingCollageTee;
   const backImg = PRODUCT_IMAGES_BACK[p.name] || frontImg;
   const [altView, setAltView] = useState(false);
 
@@ -1288,6 +1333,515 @@ export function Shop() {
   );
 }
 
+/* ═══ SECTION: BESPOKE PRINT ARCHIVE & RECENT DROPS (ALL 12 RELEASES) ═══ */
+export interface ArchiveItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: "cinema" | "sports" | "spiritual" | "streetwear" | "promo";
+  categoryLabel: string;
+  badge: string;
+  fabric: string;
+  printMethod: string;
+  gsm: string;
+  image: string;
+  aspectRatio: string;
+  price: number;
+  description: string;
+  tags: string[];
+}
+
+export const ARCHIVE_ITEMS: ArchiveItem[] = [
+  {
+    id: "racing-collage",
+    title: "CINEMATIC RACING COLLAGE TEE",
+    subtitle: "Vijay & Ajith Motorsport Camaraderie Tribute",
+    category: "cinema",
+    categoryLabel: "CINEMA & POP CULTURE",
+    badge: "NEW DROP",
+    fabric: "240 GSM Luxury Heavyweight Cotton",
+    printMethod: "Multi-layer High-Density DTF",
+    gsm: "240 GSM",
+    image: racingCollageTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 499,
+    description: "Dynamic cinematic motorsport graphic celebrating Tamil cinema camaraderie, speed helmets and racing typography on pitch-black blank.",
+    tags: ["240 GSM", "OVERSIZED", "HIGH-DENSITY DTF"],
+  },
+  {
+    id: "thalapathy-poster",
+    title: "CHIEF MINISTER THALAPATHY POSTER TEE",
+    subtitle: "Red Textured Portrait & Bold Barcode Typography",
+    category: "cinema",
+    categoryLabel: "CINEMA & POP CULTURE",
+    badge: "BESTSELLER",
+    fabric: "240 GSM Heavyweight Combed Cotton",
+    printMethod: "Rich Contrast DTF with Barcode Detail",
+    gsm: "240 GSM",
+    image: thalapathyPosterTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 499,
+    description: "High-impact red textured poster backdrop featuring Thalapathy Vijay portrait with industrial barcode markers and rally typography.",
+    tags: ["240 GSM", "OVERSIZED", "DTF PRINT"],
+  },
+  {
+    id: "ajith-thala",
+    title: "AJITH KUMAR 'NO RULES' GRITTY TEE",
+    subtitle: "Thala Gritty Silkscreen on Pure White Silhouette",
+    category: "cinema",
+    categoryLabel: "CINEMA & POP CULTURE",
+    badge: "ICON EDITION",
+    fabric: "200 GSM Bio-Washed Ring-Spun Cotton",
+    printMethod: "High-Contrast Screen & Micro DTF",
+    gsm: "200 GSM",
+    image: ajithThalaTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Crisp white streetwear blank printed with gritty monochrome and red duotone Ajith Kumar portrait and bold 'NO RULES. ONLY THALA' lettering.",
+    tags: ["200 GSM", "REGULAR FIT", "SCREEN PRINT"],
+  },
+  {
+    id: "muruga-vel",
+    title: "MURUGA VEL SACRED GRAPHIC TEE",
+    subtitle: "Fiery Golden Sacred Spear Spiritual Streetwear",
+    category: "spiritual",
+    categoryLabel: "SPIRITUAL & HERITAGE",
+    badge: "1-OF-1 BESPOKE",
+    fabric: "240 GSM Heavyweight Pitch Black Cotton",
+    printMethod: "Golden DTF with Micro-Particle Gradient",
+    gsm: "240 GSM",
+    image: murugaVelTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 499,
+    description: "Intricate sacred Muruga Vel spear surrounded by glowing fiery gold and orange micro-gradients. High-density crack-proof finish on deep black cotton.",
+    tags: ["240 GSM", "HEAVYWEIGHT", "GOLDEN DTF"],
+  },
+  {
+    id: "dhoni-tribute",
+    title: "MS DHONI 'CAPTAIN LEADER LEGEND' TEE",
+    subtitle: "CSK Yellow & Gold Duotone Tribute on Racing Red",
+    category: "sports",
+    categoryLabel: "SPORTS & ATHLETIC",
+    badge: "CRICKET LEGACY",
+    fabric: "200 GSM Soft-Touch Combed Cotton",
+    printMethod: "High-Impact Duotone Direct-to-Film",
+    gsm: "200 GSM",
+    image: dhoniTributeTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Fiery racing red streetwear blank showcasing MS Dhoni in golden CSK duotone graphics with iconic 'Whistle Podu' typography.",
+    tags: ["200 GSM", "CSK TRIBUTE", "DUOTONE DTF"],
+  },
+  {
+    id: "str-film",
+    title: "SILAMBARASAN TR RETRO NOIR FILM TEE",
+    subtitle: "Monochrome Film Cell & Newspaper Clipping Collage",
+    category: "cinema",
+    categoryLabel: "CINEMA & POP CULTURE",
+    badge: "RETRO NOIR",
+    fabric: "200 GSM Pure White Bio-Washed Cotton",
+    printMethod: "Fine-Line Halftone Screen & DTF",
+    gsm: "200 GSM",
+    image: strFilmCollageTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Vintage cinema film frames, newspaper typographic clippings, and monochrome Silambarasan TR portrait on pure white heavyweight blank.",
+    tags: ["200 GSM", "PURE WHITE", "HALFTONE PRINT"],
+  },
+  {
+    id: "neon-scene",
+    title: "CYBERPUNK NEON NIGHT SCENE TEE",
+    subtitle: "Synthwave Magenta & Electric Cyan Street Art",
+    category: "streetwear",
+    categoryLabel: "STREETWEAR GRAPHICS",
+    badge: "SYNTHWAVE",
+    fabric: "220 GSM Relaxed Fit Streetwear Blank",
+    printMethod: "Ultra-Vibrant CMYK Direct-to-Film",
+    gsm: "220 GSM",
+    image: neonSceneTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Futuristic neon city nightscape rendered in luminous cyan, magenta, and deep violet pigments on jet black cotton.",
+    tags: ["220 GSM", "NEON DTF", "SYNTHWAVE"],
+  },
+  {
+    id: "red-dragon",
+    title: "RED DRAGON HIP-HOP STREETWEAR TEE",
+    subtitle: "Fierce Oriental Dragon Illustration & Graffiti Type",
+    category: "streetwear",
+    categoryLabel: "STREETWEAR GRAPHICS",
+    badge: "STREET CULTURE",
+    fabric: "240 GSM Heavyweight Streetwear Cotton",
+    printMethod: "High-Density Crack-Proof Plastisol Screen",
+    gsm: "240 GSM",
+    image: redDragonTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 499,
+    description: "Intense crimson dragon artwork intertwined with bold hip-hop calligraphy, engineered for oversized street drape and durability.",
+    tags: ["240 GSM", "DRAGON ART", "PLASTISOL SCREEN"],
+  },
+  {
+    id: "suresh-raina",
+    title: "SURESH RAINA 'CHINNA THALA' LEGACY TEE",
+    subtitle: "Yellow Jersey #3 Tribute on Heather Grey Blank",
+    category: "sports",
+    categoryLabel: "SPORTS & ATHLETIC",
+    badge: "CHINNA THALA",
+    fabric: "200 GSM Heather Grey Bio-Washed Cotton",
+    printMethod: "Vibrant Athletic Screen & DTF",
+    gsm: "200 GSM",
+    image: sureshRainaTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Tribute to Suresh Raina's immortal legacy in yellow, number 3 emblem, and bold sports typographic framing on soft heather grey cotton.",
+    tags: ["200 GSM", "HEATHER GREY", "ATHLETIC PRINT"],
+  },
+  {
+    id: "vintage-murugan",
+    title: "VINTAGE MURUGAN SEPIA GRAPHIC TEE",
+    subtitle: "Intricate Classic Temple Art & Tamil Calligraphy",
+    category: "spiritual",
+    categoryLabel: "SPIRITUAL & HERITAGE",
+    badge: "HERITAGE ART",
+    fabric: "240 GSM Vintage-Washed Cream Cotton",
+    printMethod: "Sepia Tonal Screen with Crack-Resistant Cure",
+    gsm: "240 GSM",
+    image: vintageMuruganTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Temple architecture etching and classic Murugan divinity rendered in warm antique sepia tones on heavy vintage cream cotton.",
+    tags: ["240 GSM", "SEPIA WASH", "HERITAGE SCREEN"],
+  },
+  {
+    id: "burgundy-cartoon",
+    title: "BURGUNDY STREETWEAR COMIC CARTOON TEE",
+    subtitle: "Vadivelu Pop Culture Comic Street Art on Wooden Hanger",
+    category: "cinema",
+    categoryLabel: "CINEMA & POP CULTURE",
+    badge: "CULT MEME ART",
+    fabric: "200 GSM Rich Burgundy Combed Cotton",
+    printMethod: "Multi-Color Silkscreen & Sharp Typography",
+    gsm: "200 GSM",
+    image: burgundyCartoonTee,
+    aspectRatio: "aspect-[4/5]",
+    price: 499,
+    description: "Vibrant comic art and iconic Tamil humor typography on premium burgundy blank. Features smooth hand-feel and fade-proof colorfast inks.",
+    tags: ["200 GSM", "BURGUNDY", "COMIC SILKSCREEN"],
+  },
+  {
+    id: "festival-offers",
+    title: "VIJAYADASHAMI FESTIVAL DROPS POSTER",
+    subtitle: "Exclusive Studio Deals, Tiered Bulk Pricing & 0 MOQ",
+    category: "promo",
+    categoryLabel: "STUDIO SPECIALS",
+    badge: "UP TO 40% OFF",
+    fabric: "All Blanks (Tees, Hoodies, Sweatshirts)",
+    printMethod: "Screen, DTF, Puff & Embroidery",
+    gsm: "200-430 GSM",
+    image: festivalOffersPoster,
+    aspectRatio: "aspect-[4/5]",
+    price: 399,
+    description: "Limited festival promotion poster from our Puducherry workshop offering up to 40% discount on single custom pieces and squad bulk orders.",
+    tags: ["PROMO", "0 MOQ", "UP TO 40% OFF"],
+  },
+];
+
+export function PrintArchive() {
+  const [selectedCat, setSelectedCat] = useState<string>("all");
+  const [activeModalItem, setActiveModalItem] = useState<ArchiveItem | null>(null);
+
+  // Modal body scroll lock and escape listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveModalItem(null);
+    };
+    if (activeModalItem) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeModalItem]);
+
+  const categories = [
+    { key: "all", label: `ALL DROPS (${ARCHIVE_ITEMS.length})` },
+    { key: "cinema", label: "CINEMA & POP CULTURE" },
+    { key: "sports", label: "SPORTS & ATHLETIC" },
+    { key: "spiritual", label: "SPIRITUAL & HERITAGE" },
+    { key: "streetwear", label: "STREETWEAR GRAPHICS" },
+    { key: "promo", label: "STUDIO SPECIALS" },
+  ];
+
+  const filteredItems =
+    selectedCat === "all"
+      ? ARCHIVE_ITEMS
+      : ARCHIVE_ITEMS.filter((item) => item.category === selectedCat);
+
+  return (
+    <section id="archive" className="section relative bg-transparent border-t border-white/10 pt-16 sm:pt-20">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4A62A]/35 to-transparent pointer-events-none" />
+
+      <SectionHeading
+        index="03"
+        eyebrow="BESPOKE PRINT ARCHIVE // 12 NEW RELEASES"
+        title={
+          <>
+            AUTHENTIC STREET DROPS.
+            <br />
+            <span className="text-metal">1-OF-1 & LIMITED RUNS.</span>
+          </>
+        }
+        sub="Every graphic in our collection is precision-calibrated in our Puducherry print lab. Inspected for razor-sharp linework, high-density pigment depth, and zero cracking over 50+ wash cycles."
+      />
+
+      {/* Category Filter Pills */}
+      <div className="mt-8 flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {categories.map((cat) => (
+          <button
+            key={cat.key}
+            onClick={() => setSelectedCat(cat.key)}
+            className={`shrink-0 px-4 py-2 font-mono text-xs tracking-wider transition-all cursor-pointer rounded-sm border ${
+              selectedCat === cat.key
+                ? "border-[#F4D477] bg-[#D4A62A] text-[#04070a] font-bold shadow-[0_0_16px_rgba(212,166,42,0.35)]"
+                : "border-white/10 panel text-[#D9D9D9] hover:border-white/30 hover:text-white"
+            }`}
+          >
+            [ {cat.label} ]
+          </button>
+        ))}
+      </div>
+
+      {/* 14-item Grid */}
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filteredItems.map((item, idx) => (
+          <Reveal
+            key={item.id}
+            delay={(idx % 4) * 70}
+            className="panel group relative flex flex-col rounded-sm p-4 transition-all duration-300 hover:border-[#D4A62A]/60 hover:shadow-[0_16px_40px_rgba(0,0,0,0.85),0_0_24px_rgba(212,166,42,0.12)] bg-[#06080a]"
+          >
+            {/* Top Bar: Numbering + Category */}
+            <div className="flex items-center justify-between font-mono text-[10px] text-[#a3a3a3] mb-3">
+              <span className="text-[#D4A62A] font-bold">
+                [{String(idx + 1).padStart(2, "0")}/{String(filteredItems.length).padStart(2, "0")}]
+              </span>
+              <span className="tracking-widest uppercase text-[#a3a3a3] truncate max-w-[150px]">
+                {item.categoryLabel}
+              </span>
+            </div>
+
+            {/* Image Preview Box with Hover Actions */}
+            <div
+              className="relative aspect-[4/5] overflow-hidden rounded-sm bg-[#04070a] cursor-pointer"
+              onClick={() => setActiveModalItem(item)}
+            >
+              <img
+                src={item.image}
+                alt={`${item.title} - ${item.subtitle}`}
+                loading="lazy"
+                width={1145}
+                height={1374}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-106"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#04070a]/90 via-transparent to-transparent opacity-60 pointer-events-none" />
+
+              {/* Badge */}
+              <span className="absolute top-3 left-3 bg-[#D4A62A] text-[#04070a] px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider rounded-sm shadow-md">
+                {item.badge}
+              </span>
+
+              {/* Quick Inspect Button on Hover */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveModalItem(item);
+                }}
+                className="absolute top-3 right-3 flex items-center gap-1 bg-[#04070a]/85 hover:bg-[#04070a] text-white px-2 py-1 font-mono text-[9px] rounded-sm border border-white/10 backdrop-blur-md transition-colors"
+                title="Inspect high-res print details"
+              >
+                <Maximize2 size={11} className="text-[#F4D477]" />
+                <span className="hidden sm:inline">ZOOM</span>
+              </button>
+
+              {/* Bottom Tags Overlay */}
+              <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5 pointer-events-none">
+                {item.tags.slice(0, 2).map((tag) => (
+                  <span
+                    key={tag}
+                    className="font-mono text-[9px] bg-[#04070a]/85 border border-white/10 px-2 py-0.5 text-[#F4D477] backdrop-blur-md rounded-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Title & Subtitle */}
+            <h3
+              onClick={() => setActiveModalItem(item)}
+              className="display mt-4 text-xl sm:text-2xl text-white group-hover:text-[#F4D477] transition-colors cursor-pointer line-clamp-1"
+            >
+              {item.title}
+            </h3>
+            <p className="mt-1 text-xs text-[#A3A3A3] line-clamp-2 leading-relaxed">
+              {item.subtitle}
+            </p>
+
+            {/* Fabric & Tech Print Info */}
+            <div className="mt-3 flex items-center justify-between font-mono text-[10px] text-[#8e8e8e] border-t border-white/5 pt-2.5">
+              <span>{item.gsm}</span>
+              <span className="text-[#D4A62A] truncate max-w-[130px]">{item.printMethod}</span>
+            </div>
+
+            {/* Price & Direct WhatsApp CTA */}
+            <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-lg font-bold text-[#F4D477]">
+                  {inr(item.price)}
+                </span>
+                <span className="font-mono text-[10px] text-[#a3a3a3]">
+                  STARTING
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveModalItem(item)}
+                className="font-mono text-[10px] text-[#a3a3a3] hover:text-white underline cursor-pointer"
+              >
+                SPECS & SIZES
+              </button>
+            </div>
+
+            <BracketButton
+              href={waLink(
+                `Hi Vince Outlets, I want to order the "${item.title}" (${item.subtitle}) starting at ${inr(item.price)}. Please share size availability and delivery timeline.`
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="gold"
+              className="mt-3 !w-full !justify-center !text-xs !py-2"
+            >
+              CUSTOMISE THIS PIECE <span className="arw font-mono">→</span>
+            </BracketButton>
+          </Reveal>
+        ))}
+      </div>
+
+      {/* Interactive Lightbox / Print Inspection Modal */}
+      {activeModalItem && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#04070a]/92 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setActiveModalItem(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-sm border border-[#D4A62A]/50 bg-[#06080a] p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setActiveModalItem(null)}
+              className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-sm border border-white/10 bg-[#0e1418] text-white hover:border-[#D4A62A] hover:text-[#F4D477] transition-all cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="grid gap-8 md:grid-cols-12 md:items-center">
+              {/* Left Column: Full-Res Image Viewer */}
+              <div className="md:col-span-6 relative aspect-[4/5] overflow-hidden rounded-sm border border-white/10 bg-[#04070a]">
+                <img
+                  src={activeModalItem.image}
+                  alt={activeModalItem.title}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute top-3 left-3 bg-[#D4A62A] text-[#04070a] px-2.5 py-1 font-mono text-[10px] font-bold tracking-wider rounded-sm shadow-md">
+                  {activeModalItem.badge}
+                </span>
+                <span className="absolute bottom-3 left-3 font-mono text-[10px] bg-[#04070a]/90 text-[#F4D477] px-2.5 py-1 border border-[#D4A62A]/30 backdrop-blur-md">
+                  {activeModalItem.fabric}
+                </span>
+              </div>
+
+              {/* Right Column: Print Technical Specifications */}
+              <div className="md:col-span-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-mono text-xs text-[#D4A62A] font-bold">
+                    [STUDIO PRINT SPECIFICATION]
+                  </span>
+                  <span className="font-mono text-[10px] text-[#a3a3a3] uppercase">
+                    {activeModalItem.categoryLabel}
+                  </span>
+                </div>
+
+                <h2 className="display text-2xl sm:text-3xl text-white font-bold leading-tight">
+                  {activeModalItem.title}
+                </h2>
+                <p className="mt-2 text-sm text-[#F4D477] font-mono">
+                  {activeModalItem.subtitle}
+                </p>
+
+                <p className="mt-4 text-xs sm:text-sm text-[#D9D9D9] leading-relaxed">
+                  {activeModalItem.description}
+                </p>
+
+                {/* Specs Table */}
+                <div className="mt-6 space-y-2 border-y border-white/10 py-4 font-mono text-xs">
+                  <div className="flex justify-between py-1 border-b border-white/5">
+                    <span className="text-[#a3a3a3]">FABRIC BLANK:</span>
+                    <span className="text-white font-bold">{activeModalItem.fabric}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-white/5">
+                    <span className="text-[#a3a3a3]">PRINT TECHNIQUE:</span>
+                    <span className="text-[#F4D477] font-bold">{activeModalItem.printMethod}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-white/5">
+                    <span className="text-[#a3a3a3]">DURABILITY RATING:</span>
+                    <span className="text-white font-bold">50+ Washes (Crack-Proof)</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-[#a3a3a3]">AVAILABLE SIZES:</span>
+                    <span className="text-white font-bold">S, M, L, XL, 2XL, 3XL, 4XL, 5XL</span>
+                  </div>
+                </div>
+
+                {/* Pricing & Order CTA */}
+                <div className="mt-6 flex items-baseline justify-between">
+                  <div>
+                    <span className="font-mono text-[10px] text-[#a3a3a3] block">STARTING PRICE</span>
+                    <span className="font-mono text-2xl font-bold text-[#F4D477]">
+                      {inr(activeModalItem.price)}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] text-[#a3a3a3]">
+                    NO MINIMUMS • 0 MOQ
+                  </span>
+                </div>
+
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <WhatsAppButton
+                    text={`Hi Vince Outlets, I am interested in ordering the "${activeModalItem.title}" (${activeModalItem.subtitle}) at ${inr(activeModalItem.price)}. Please share size guide and dispatch timeline.`}
+                    variant="gold"
+                    className="!w-full !justify-center !text-sm"
+                  >
+                    ORDER THIS PIECE VIA WHATSAPP <span className="arw font-mono">→</span>
+                  </WhatsAppButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // Backward-compatibility alias
 export const HowItWorks = () => null;
 
@@ -1366,7 +1920,7 @@ export function Why() {
   );
 }
 
-/* ═══ SECTION 5: BULK / CUSTOM ORDERS ═══ */
+/* ═══ SECTION 5: BULK / CUSTOM SQUAD ORDERS & STUDIO PROMOTIONS ═══ */
 export function Bulk() {
   const squadCategories = [
     "College Culturals & Squads",
@@ -1379,21 +1933,12 @@ export function Bulk() {
 
   return (
     <section id="bulk" className="relative overflow-hidden bg-transparent border-t border-white/10 pt-16 sm:pt-20">
-      {/* Background Squad Image with subtle dark overlay */}
-      <img
-        src={squad}
-        alt="Squad wearing matching custom black streetwear printed tees at night"
-        loading="lazy"
-        width={1600}
-        height={912}
-        className="absolute inset-0 h-full w-full object-cover opacity-20"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#04070a] via-[#04070a]/92 to-[#04070a]/80" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#04070a] via-[#04070a]/94 to-[#04070a]/85" />
 
       <div className="relative mx-auto max-w-[1500px] px-5 py-20 lg:px-10 lg:py-28">
         <SectionHeading
-          index="04"
-          eyebrow="BULK & CUSTOM ORDERS"
+          index="05"
+          eyebrow="BULK & SQUAD MERCHANDISE"
           title={
             <>
               ONE DESIGN.
@@ -1406,21 +1951,60 @@ export function Bulk() {
           sub="Planning a college fest drop, sports jersey order, company apparel, or friends trip? Vince Outlets handles bulk custom orders with tiered volume pricing and guaranteed studio quality."
         />
 
-        <div className="mt-8 flex flex-wrap gap-2.5 max-w-2xl">
-          {squadCategories.map((cat) => (
-            <span
-              key={cat}
-              className="panel px-4 py-2 font-mono text-xs text-[#D9D9D9] rounded-sm border border-white/10 bg-[#06080a]"
-            >
-              {cat}
-            </span>
-          ))}
-        </div>
+        {/* Studio Special Offers Spotlight Banner with real Festival Poster */}
+        <div className="mt-12 panel relative overflow-hidden rounded-sm border border-[#D4A62A]/40 bg-[#06080a] p-6 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-4 relative aspect-square overflow-hidden rounded-sm border border-white/10 bg-[#04070a]">
+              <img
+                src={festivalOffersPoster}
+                alt="Vince Outlets Vijayadashami Special Festival Offers Poster"
+                loading="lazy"
+                width={1254}
+                height={1254}
+                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+              />
+              <span className="absolute top-3 left-3 bg-[#D4A62A] text-[#04070a] px-2.5 py-1 font-mono text-[9px] font-bold tracking-wider rounded-sm shadow-md">
+                STUDIO SPECIAL DROP
+              </span>
+            </div>
 
-        <div className="mt-10">
-          <WhatsAppButton text={MSG.bulk} variant="gold">
-            GET A SQUAD BULK QUOTE <span className="arw font-mono">→</span>
-          </WhatsAppButton>
+            <div className="lg:col-span-8">
+              <div className="inline-flex items-center gap-2 rounded-sm border border-[#D4A62A]/30 bg-[#0e1418] px-3 py-1 font-mono text-[10px] text-[#F4D477] uppercase mb-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A62A] animate-pulse" />
+                LIMITED PROMOTION // ALL-INDIA DISPATCH
+              </div>
+              <h3 className="display text-2xl sm:text-3xl lg:text-4xl text-white font-bold tracking-tight">
+                VIJAYADASHAMI SPECIAL: <span className="text-[#F4D477]">UP TO 40% OFF</span>
+              </h3>
+              <p className="mt-3 text-sm text-[#D9D9D9] leading-relaxed max-w-2xl">
+                Upgrade your squad or brand merchandise with our festival pricing. Whether you are printing 10 tees or 500 hoodies, get direct factory rates with premium 240+ GSM heavyweight fabrics and zero compromise on print quality.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                {squadCategories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="panel px-3.5 py-1.5 font-mono text-xs text-[#D9D9D9] rounded-sm border border-white/10 bg-[#080d12]"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                <WhatsAppButton
+                  text="Hi Vince Outlets, I'm interested in the Vijayadashami festival bulk offer. Please share tiered pricing and turnaround times for my order."
+                  variant="gold"
+                >
+                  CLAIM FESTIVAL BULK QUOTE <span className="arw font-mono">→</span>
+                </WhatsAppButton>
+                <span className="font-mono text-xs text-[#a3a3a3] flex items-center gap-2">
+                  <CheckCircle2 size={14} className="text-[#D4A62A]" />
+                  Zero Minimum Order Requirement (0 MOQ)
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1498,13 +2082,42 @@ export function ContactSection() {
                 <p className="font-mono text-[10px] tracking-widest text-[#a3a3a3] uppercase font-bold mb-1">
                   WHATSAPP DIRECT
                 </p>
+                <div className="flex flex-col gap-1 font-mono text-sm sm:text-base">
+                  <a
+                    href={waLink(MSG.general, WA_NUMBER)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white hover:text-[#F4D477] transition-colors"
+                  >
+                    {WA_DISPLAY} <span className="text-[10px] text-[#25D366]">(PRIMARY)</span>
+                  </a>
+                  <a
+                    href={waLink(MSG.general, WA_NUMBER_ALT)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#a3a3a3] hover:text-white transition-colors text-xs"
+                  >
+                    {WA_DISPLAY_ALT} <span className="text-[10px] text-[#a3a3a3]">(ALT / DIRECT)</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-white/10 bg-[#04070a] text-[#F4D477]">
+                <Star size={18} className="fill-[#F4D477]" />
+              </div>
+              <div>
+                <p className="font-mono text-[10px] tracking-widest text-[#a3a3a3] uppercase font-bold mb-1">
+                  GOOGLE REVIEWS
+                </p>
                 <a
-                  href={waLink(MSG.general)}
+                  href={GOOGLE_REVIEWS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-sm sm:text-base text-white hover:text-[#F4D477] transition-colors"
+                  className="inline-flex items-center gap-1 font-mono text-xs text-[#F4D477] hover:underline"
                 >
-                  {WA_DISPLAY}
+                  VINCE OUTLETS REVIEWS (5.0 ★) <ArrowUpRight size={13} />
                 </a>
               </div>
             </div>
@@ -1598,7 +2211,7 @@ export function Footer() {
             <ul className="space-y-2.5 font-mono text-xs text-[#a3a3a3]">
               <li>
                 <a
-                  href={waLink(MSG.general)}
+                  href={waLink(MSG.general, WA_NUMBER)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors flex items-center gap-1.5"
@@ -1609,7 +2222,18 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="tel:+916369963871"
+                  href={waLink(MSG.general, WA_NUMBER_ALT)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+                  ALT WA: {WA_DISPLAY_ALT}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:${PHONE.replace(/\s+/g, "")}`}
                   className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <Phone size={13} />
@@ -1625,6 +2249,17 @@ export function Footer() {
                 >
                   <Instagram size={13} />
                   @VINCE_OUTLETS
+                </a>
+              </li>
+              <li>
+                <a
+                  href={GOOGLE_REVIEWS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#F4D477] transition-colors flex items-center gap-1.5 text-[#F4D477]"
+                >
+                  <Star size={13} className="fill-[#F4D477]" />
+                  GOOGLE REVIEWS (5.0 ★)
                 </a>
               </li>
             </ul>
@@ -1644,8 +2279,34 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Dedicated CloudMaSa Footer Attribution */}
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col items-center justify-center text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <span className="font-mono text-xs text-[#a3a3a3] uppercase tracking-widest font-medium">
+              Built by
+            </span>
+            <a
+              href={CLOUDMASA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Built by CloudMaSa - Visit CloudMaSa Website"
+              className="inline-flex items-center transition-transform duration-300 hover:scale-105 opacity-90 hover:opacity-100"
+            >
+              <img
+                src={cloudmasaLogo}
+                alt="CloudMaSa"
+                width={731}
+                height={341}
+                loading="lazy"
+                decoding="async"
+                className="h-9 sm:h-11 w-auto object-contain drop-shadow-[0_4px_16px_rgba(212,166,42,0.25)]"
+              />
+            </a>
+          </div>
+        </div>
+
         {/* Copyright & Coordinates Sub-footer */}
-        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-[#a3a3a3]">
+        <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px] text-[#a3a3a3] safe-bottom">
           <p>© 2026 VINCE OUTLETS. ALL RIGHTS RESERVED.</p>
           <p className="text-[#D4A62A] tracking-wider uppercase">
             LUXURY STREETWEAR • BESPOKE PRINTS • PUDUCHERRY
@@ -1656,18 +2317,70 @@ export function Footer() {
   );
 }
 
-/* ═══ FLOATING WHATSAPP BUTTON ═══ */
-export function FloatingWhatsApp() {
+/* ═══ COORDINATED FLOATING ACTION GROUP (WHATSAPP • INSTAGRAM • GOOGLE REVIEWS) ═══ */
+export function FloatingActionGroup() {
   return (
-    <a
-      href={waLink(MSG.general)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Chat with Vince Outlets on WhatsApp"
-      className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-sm bg-[#04070a] border-2 border-[#D4A62A] text-[#F4D477] shadow-[0_8px_30px_rgba(212,166,42,0.4)] transition-all duration-300 hover:scale-110 hover:shadow-[0_12px_40px_rgba(212,166,42,0.65)] hover:border-[#F4D477]"
+    <aside
+      aria-label="Floating quick contact and reviews"
+      className="floating-action-group flex flex-col items-end gap-2.5 pointer-events-none"
     >
-      <WhatsAppIcon className="w-7 h-7 text-[#25D366]" />
-      <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-[#D4A62A] animate-ping" />
-    </a>
+      {/* 1. Google Reviews Floating Action */}
+      <a
+        href={GOOGLE_REVIEWS_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Google Reviews - Read and submit reviews on Google"
+        className="pointer-events-auto group flex items-center gap-2 rounded-full border border-white/15 bg-[#06080a]/92 px-3.5 py-2 text-xs font-mono text-[#D9D9D9] shadow-[0_8px_24px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-[#D4A62A] hover:text-[#F4D477]"
+      >
+        <GoogleIcon className="h-4 w-4 shrink-0" />
+        <span className="hidden sm:inline font-bold tracking-wider text-[11px] uppercase">
+          Google Reviews
+        </span>
+        <span className="flex items-center text-[#F4D477] text-[10px] font-bold">
+          ★ 5.0
+        </span>
+      </a>
+
+      {/* 2. Official Instagram Floating Action */}
+      <a
+        href={INSTAGRAM}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Follow Vince Outlets on Instagram @vince_outlets"
+        className="pointer-events-auto group flex items-center gap-2 rounded-full border border-white/15 bg-[#06080a]/92 px-3.5 py-2 text-xs font-mono text-[#D9D9D9] shadow-[0_8px_24px_rgba(0,0,0,0.7)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-[#E1306C] hover:text-white"
+      >
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-tr from-[#FD1D1D] via-[#E1306C] to-[#405DE6] text-white shrink-0">
+          <Instagram size={12} className="stroke-[2.5]" />
+        </div>
+        <span className="hidden sm:inline font-bold tracking-wider text-[11px] uppercase">
+          Instagram
+        </span>
+      </a>
+
+      {/* 3. Official WhatsApp Floating Action */}
+      <a
+        href={waLink(MSG.general, WA_NUMBER)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with Vince Outlets on WhatsApp (+91 63699 63871)"
+        className="pointer-events-auto group relative flex items-center gap-2.5 rounded-full border-2 border-[#D4A62A] bg-[#04070a] px-4 py-2.5 text-xs font-mono text-[#F4D477] shadow-[0_8px_30px_rgba(212,166,42,0.4)] transition-all duration-300 hover:scale-105 hover:border-[#F4D477] hover:shadow-[0_12px_40px_rgba(212,166,42,0.65)]"
+      >
+        <div className="relative shrink-0">
+          <WhatsAppIcon className="h-6 w-6 text-[#25D366]" />
+          <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#D4A62A] animate-ping" />
+        </div>
+        <div className="hidden sm:flex flex-col text-left">
+          <span className="font-bold tracking-wider text-[11px] text-white uppercase leading-none">
+            WhatsApp Studio
+          </span>
+          <span className="text-[9px] text-[#25D366] font-mono mt-0.5">
+            ONLINE // +91 63699 63871
+          </span>
+        </div>
+      </a>
+    </aside>
   );
 }
+
+// Backward-compatibility alias
+export const FloatingWhatsApp = FloatingActionGroup;

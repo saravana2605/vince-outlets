@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>";
 const STEP_MS = 35;
@@ -32,7 +32,9 @@ export function ScrambleText({
 
   const runDecode = useCallback(() => {
     if (isRunningRef.current) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (typeof window === "undefined") return;
+
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reducedMotion) {
       setDisplayText(originalText);
       return;
@@ -69,10 +71,15 @@ export function ScrambleText({
   }, [originalText]);
 
   useEffect(() => {
-    if (!triggerOnArrival || !containerRef.current) return;
+    if (!triggerOnArrival || !containerRef.current || typeof window === "undefined") return;
     const el = containerRef.current;
 
     let timeoutId: number;
+    if (typeof IntersectionObserver === "undefined") {
+      timeoutId = window.setTimeout(runDecode, delay);
+      return () => clearTimeout(timeoutId);
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
